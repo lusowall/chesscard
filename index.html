@@ -124,13 +124,18 @@
   }
   .c-photo img{width:100%;height:100%;object-fit:cover;display:block}
   .c-name{
-    position:relative;z-index:2;margin-top:168px;text-align:center;
-    font-family:"Anton";font-size:30px;letter-spacing:.5px;text-transform:uppercase;
+    position:relative;z-index:2;margin-top:160px;text-align:center;
+    font-family:"Anton";font-size:29px;letter-spacing:.5px;text-transform:uppercase;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
   .c-archetype{
     position:relative;z-index:2;text-align:center;font-family:"JetBrains Mono";
-    font-weight:700;font-size:13px;letter-spacing:1px;margin-top:-2px;opacity:.92;
+    font-weight:700;font-size:12.5px;letter-spacing:.8px;margin-top:-2px;opacity:.92;
+  }
+  .c-flagship{
+    position:relative;z-index:2;text-align:center;font-family:"Chivo";font-weight:900;
+    font-size:13px;margin-top:5px;padding:0 10px;
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;opacity:.95;
   }
   .c-rule{height:2px;background:currentColor;opacity:.25;margin:9px 6px;position:relative;z-index:2}
   .c-stats{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;padding:0 8px}
@@ -168,6 +173,9 @@
   .arche-title{font-family:"Anton";font-size:34px;color:var(--acc);letter-spacing:.5px;line-height:1}
   .arche-sub{font-family:"JetBrains Mono";font-size:13px;color:var(--ink);opacity:.75;margin:4px 0 10px}
   .arche-why{font-size:13.5px;color:var(--ink);opacity:.92}
+  .feats{display:flex;flex-direction:column;gap:6px;margin-top:12px}
+  .feat{font-family:"Chivo";font-weight:700;font-size:13.5px;color:var(--ink);background:#070a0f;border:1px solid var(--line);border-radius:9px;padding:8px 11px}
+  .feat span{margin-right:6px}
   a{color:var(--acc2)}
 </style>
 </head>
@@ -344,11 +352,12 @@ async function run(){
 function analyse(user, games, profile, stats){
   let W=0,L=0,D=0;
   let whiteW=0,whiteN=0, blackW=0,blackN=0;
-  let timeWins=0, mateWins=0, totalWins=0;
-  let fianchetto=0;
+  let timeWins=0, timeLosses=0, mateWins=0, totalWins=0;
+  let fianchetto=0, topBeat=0;
   const openings={}; // name -> {n,w}
   const opp={};      // name -> {n,w,l}
   const byDay={};    // day -> [{t,res}]
+  const chrono=[];   // {t,res,rated} pour les séries
 
   const drawRes = new Set(["agreed","repetition","stalemate","insufficient","timevsinsufficient","50move"]);
 
@@ -368,7 +377,9 @@ function analyse(user, games, profile, stats){
       totalWins++;
       if(you.result==="timeout") timeWins++;
       if(you.result==="checkmated") mateWins++;
+      if(g.rated && you.rating && you.rating>topBeat) topBeat=you.rating;
     }
+    if(res==="L" && me.result==="timeout") timeLosses++;
 
     // openings
     const op = openingFromGame(g);
@@ -385,14 +396,21 @@ function analyse(user, games, profile, stats){
       opp[on].n++; if(res==="W")opp[on].w++; else if(res==="L")opp[on].l++;
     }
 
-    // per day for tilt
+    // per day for tilt + chrono global
     const t = (g.end_time||0)*1000;
     const day = new Date(t).toISOString().slice(0,10);
     (byDay[day]=byDay[day]||[]).push({t,res});
+    chrono.push({t,res,rated:!!g.rated});
   }
 
   const total=W+L+D;
   const winRate = pct(W,total);
+
+  // meilleure série de victoires (parties classées, ordre chronologique)
+  let bestWinStreak=0, cw=0;
+  chrono.slice().sort((a,b)=>a.t-b.t).forEach(x=>{
+    if(x.rated){ if(x.res==="W"){cw++; bestWinStreak=Math.max(bestWinStreak,cw);} else cw=0; }
+  });
 
   // longest loss streak within a single day
   let worstStreak=0;
@@ -443,20 +461,31 @@ function analyse(user, games, profile, stats){
   }
   if(!lifetime) lifetime=total;
 
-  const OVR = clamp(Math.round(40 + (elo-600)/1400*59),30,99);
-
-  const horloger = pct(timeWins,Math.max(1,totalWins));      // % wins au temps
+  const horloger = pct(timeWins,Math.max(1,totalWins));      // % wins au temps (affichage)
   const fianchRate = pct(fianchetto,total);
   const drawRate = pct(D,total);
+  const lossRate = pct(L,total);
   const mateRate = pct(mateWins,Math.max(1,totalWins));
 
+  // perf dans le répertoire : winrate pondéré sur les ouvertures jouées >=3 fois
+  let owNum=0,owDen=0;
+  for(const o of opList){ if(o.n>=3){ owNum+=o.wr*o.n; owDen+=o.n; } }
+  const openPerf = owDen? Math.round(owNum/owDen) : winRate;
+
+  // gestion d'horloge nette = % victoires au temps − % défaites au temps (sur total)
+  const timeNet = pct(timeWins,total) - pct(timeLosses,total);
+
+  // ---- NOTES : ancre elo + ajustement plafonné sur les vraies stats ----
+  const base = eloBase(elo);     // niveau dérivé de l'elo (0-99)
+  const OVR  = base;
+  const adj = (delta,cap)=> clamp(Math.round(delta), -cap, cap);
   const S = {
-    TAC: clamp(Math.round(35+winRate*0.95),20,99),
-    ATT: clamp(Math.round(30+mateRate*1.0+ (60/(moves||40))*20),20,99),
-    DEF: clamp(Math.round(35+ (100-pct(L,total))*0.6),20,99),
-    OUV: clamp(Math.round(38+repertoire*3+ (favOpenings[0]?favOpenings[0].wr*0.2:0)),20,99),
-    TMP: clamp(Math.round(40+horloger*0.6),20,99),
-    MTL: clamp(100 - worstStreak*8, 12, 99)
+    TAC: clamp(base + adj((winRate-50)*0.5, 13), 20,99),                 // gagne plus que la moyenne
+    ATT: clamp(base + adj((mateRate-18)*0.35 + (42-moves)*0.5, 13), 20,99), // mats + parties courtes
+    DEF: clamp(base + adj((45-lossRate)*0.5, 13), 20,99),                // perd peu
+    OUV: clamp(base + adj((openPerf-50)*0.45, 12), 20,99),               // gagne avec son répertoire
+    TMP: clamp(base + adj(timeNet*0.5, 12), 20,99),                      // horloge nette
+    MTL: clamp(base + adj((2-worstStreak)*4, 15), 12,99)                 // résistance au tilt
   };
 
   // ---- archétype ----
@@ -475,16 +504,31 @@ function analyse(user, games, profile, stats){
 
   const piece = iAmMostlyWhite(whiteN,blackN) ? "♔" : "♚";
 
+  // ---- faits marquants (stat phare) ----
+  const feats=[];
+  if(bestWinStreak>=5) feats.push({score:bestWinStreak*7, icon:"🔥", txt:`${bestWinStreak} victoires d'affilée`});
+  if(winRate>=60)      feats.push({score:winRate,         icon:"📈", txt:`${winRate}% de winrate`});
+  if(topBeat>=elo+100) feats.push({score:45+(topBeat-elo)/8, icon:"🐉", txt:`a battu un joueur à ${topBeat}`});
+  if(lifetime>=5000)   feats.push({score:40+lifetime/1000,icon:"♟️", txt:`${lifetime.toLocaleString("fr-FR")} parties au compteur`});
+  if(mateRate>=40 && totalWins>=20) feats.push({score:mateRate, icon:"⚔️", txt:`${mateRate}% de ses victoires par échec et mat`});
+  if(horloger>=50 && totalWins>=20) feats.push({score:horloger, icon:"⏱️", txt:`${horloger}% de ses victoires au temps`});
+  if(drawRate>=25)     feats.push({score:drawRate*1.5,    icon:"🤝", txt:`${drawRate}% de parties nulles`});
+  feats.sort((a,b)=>b.score-a.score);
+  const flagship = feats[0] || {icon:"🎯", txt:`${winRate}% de winrate sur ${total} parties`};
+
   return {
     user, name:(profile.name||user), country:flag(profile.country),
-    elo, eloLabel, OVR, tier, S, arche, piece,
+    elo, eloLabel, base, OVR, tier, S, arche, piece, flagship, feats:feats.slice(0,3),
     W,L,D,total,winRate, lifetime, modeLabel, sampleRate:pct(total,lifetime),
     whiteWR:pct(whiteW,whiteN), blackWR:pct(blackW,blackN),
     horloger, drawRate, fianchRate, worstStreak, repertoire, dominance, gambitRate, moves,
+    openPerf, timeNet, bestWinStreak, topBeat,
     favOpenings, nemesis, pigeon,
     tcLabel: ($("tc").value==="all"?"toutes cadences":$("tc").value)
   };
 }
+
+function eloBase(elo){ return clamp(Math.round(30 + (elo-400)/2000*69), 25, 99); }
 
 function avgMoves(games){
   let s=0,c=0;
@@ -560,6 +604,7 @@ function render(d){
       : `<div class="c-piece">${d.piece}</div>`}
     <div class="c-name">${esc(d.name).slice(0,16)}</div>
     <div class="c-archetype">${d.arche.t} · ${d.arche.d}</div>
+    <div class="c-flagship">${d.flagship.icon} ${esc(d.flagship.txt)}</div>
     <div class="c-rule"></div>
     <div class="c-stats">
       ${stat("tactique",d.S.TAC)}${stat("ouvertures",d.S.OUV)}
@@ -572,19 +617,23 @@ function render(d){
       <div><span class="lab">PARTIES JOUÉES</span><span>${d.lifetime.toLocaleString("fr-FR")}</span></div>
       <div><span class="lab">BILAN</span><span>${d.W}V ${d.D}N ${d.L}D · ${d.winRate}%</span></div>
     </div>
-    <div class="c-watermark">CHESSCARD · @${esc(d.user)}</div>
+    <div class="c-watermark">@${esc(d.user)} · ${d.total} parties analysées · CHESSCARD</div>
   `;
 
   // breakdown
   $("breakdown").innerHTML = `
     <div class="bd-card arche-card">
-      <h3>ton archétype</h3>
+      <h3>ton archétype + faits marquants</h3>
       <div class="arche-title">${d.arche.t}</div>
       <div class="arche-sub">« ${d.arche.d} »</div>
       <p class="note arche-why">${esc(d.arche.why)}.</p>
+      <div class="feats">
+        ${d.feats.length?d.feats.map(f=>`<div class="feat"><span>${f.icon}</span> ${esc(f.txt)}</div>`).join(""):`<div class="feat"><span>${d.flagship.icon}</span> ${esc(d.flagship.txt)}</div>`}
+      </div>
     </div>
     <div class="bd-card">
       <h3>le détail (vrai data)</h3>
+      <p class="note" style="margin:-4px 0 12px">les 6 notes sont <b>ancrées sur ton elo</b> (base ${d.base}) puis ajustées ±13 selon ton style. un bronze ne peut donc pas dépasser un or.</p>
       <div class="kv">
         <div class="b"><div class="n gold">${d.lifetime.toLocaleString("fr-FR")}</div><div class="l">parties jouées (total)</div></div>
         <div class="b"><div class="n">${d.modeLabel}</div><div class="l">mode préféré</div></div>
