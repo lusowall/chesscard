@@ -442,11 +442,20 @@ function analyse(user, games, profile, stats){
   const modeLabel = {bullet:"BULLET",blitz:"BLITZ",rapid:"RAPIDE",daily:"PAR CORRESP."}[modeKey]||"—";
   const bulletShare = pct(tcCount.bullet||0,total);
 
-  // dominance d'ouverture + gambits
+  // dominance d'ouverture + gambits + ouvertures connues / solides / fétiche
   const topOpN = favOpenings[0]?favOpenings[0].n:0;
   const dominance = pct(topOpN,total);                              // % de la 1ère ouverture
-  let gambitGames=0; for(const o of opList){ if(/gambit/i.test(o.nm)) gambitGames+=o.n; }
+  const favWR = favOpenings[0]?favOpenings[0].wr:50;               // winrate de l'ouverture fétiche
+  let gambitGames=0, knownGames=0, solidGames=0;
+  const solidRe = /caro|french|fran|slav|petro|berlin|scandinav|stonewall|hippo|london|gambit declined|qgd|semi.?slav|philidor|exchange/i;
+  for(const o of opList){
+    if(/gambit/i.test(o.nm)) gambitGames+=o.n;
+    if(o.nm!=="Inconnue") knownGames+=o.n;
+    if(solidRe.test(o.nm)) solidGames+=o.n;
+  }
   const gambitRate = pct(gambitGames,total);
+  const knownRate  = pct(knownGames,total);
+  const solidRate  = pct(solidGames,total);
   const moves = avgMoves(games);
 
   // ---- ratings / stats /99 ----
@@ -467,7 +476,7 @@ function analyse(user, games, profile, stats){
   const lossRate = pct(L,total);
   const mateRate = pct(mateWins,Math.max(1,totalWins));
 
-  // perf dans le répertoire : winrate pondéré sur les ouvertures jouées >=3 fois
+  // perf dans le répertoire (gardé pour affichage)
   let owNum=0,owDen=0;
   for(const o of opList){ if(o.n>=3){ owNum+=o.wr*o.n; owDen+=o.n; } }
   const openPerf = owDen? Math.round(owNum/owDen) : winRate;
@@ -476,16 +485,22 @@ function analyse(user, games, profile, stats){
   const timeNet = pct(timeWins,total) - pct(timeLosses,total);
 
   // ---- NOTES : ancre elo + ajustement plafonné sur les vraies stats ----
-  const base = eloBase(elo);     // niveau dérivé de l'elo (0-99)
+  const base = eloBase(elo);     // niveau dérivé de l'elo
   const OVR  = base;
   const adj = (delta,cap)=> clamp(Math.round(delta), -cap, cap);
   const S = {
-    TAC: clamp(base + adj((winRate-50)*0.5, 13), 20,99),                 // gagne plus que la moyenne
-    ATT: clamp(base + adj((mateRate-18)*0.35 + (42-moves)*0.5, 13), 20,99), // mats + parties courtes
-    DEF: clamp(base + adj((45-lossRate)*0.5, 13), 20,99),                // perd peu
-    OUV: clamp(base + adj((openPerf-50)*0.45, 12), 20,99),               // gagne avec son répertoire
-    TMP: clamp(base + adj(timeNet*0.5, 12), 20,99),                      // horloge nette
-    MTL: clamp(base + adj((2-worstStreak)*4, 15), 12,99)                 // résistance au tilt
+    // tactique : gagne + finit au mat + tranchant (peu de nulles)
+    TAC: clamp(base + adj((winRate-50)*0.4 + (mateRate-18)*0.2 - (drawRate-8)*0.15, 13), 20,99),
+    // attaque : mats + parties courtes
+    ATT: clamp(base + adj((mateRate-18)*0.35 + (42-moves)*0.5, 13), 20,99),
+    // défense : perd peu + joue solide + tient des nulles
+    DEF: clamp(base + adj((45-lossRate)*0.4 + solidRate*0.12 + (drawRate-8)*0.2, 13), 20,99),
+    // ouvertures : maîtrise de la fétiche (winrate × concentration) + jouer des lignes connues
+    OUV: clamp(base + adj((favWR-50)*0.45 + clamp(dominance-12,0,40)*0.12 + (knownRate-85)*0.1, 13), 20,99),
+    // rythme : horloge nette
+    TMP: clamp(base + adj(timeNet*0.5, 12), 20,99),
+    // mental : résistance au tilt
+    MTL: clamp(base + adj((2-worstStreak)*4, 15), 12,99)
   };
 
   // ---- archétype ----
@@ -522,13 +537,13 @@ function analyse(user, games, profile, stats){
     W,L,D,total,winRate, lifetime, modeLabel, sampleRate:pct(total,lifetime),
     whiteWR:pct(whiteW,whiteN), blackWR:pct(blackW,blackN),
     horloger, drawRate, fianchRate, worstStreak, repertoire, dominance, gambitRate, moves,
-    openPerf, timeNet, bestWinStreak, topBeat,
+    openPerf, timeNet, bestWinStreak, topBeat, knownRate, solidRate, favWR,
     favOpenings, nemesis, pigeon,
     tcLabel: ($("tc").value==="all"?"toutes cadences":$("tc").value)
   };
 }
 
-function eloBase(elo){ return clamp(Math.round(30 + (elo-400)/2000*69), 25, 99); }
+function eloBase(elo){ return clamp(Math.round(40 + (elo-300)*0.027), 28, 95); }
 
 function avgMoves(games){
   let s=0,c=0;
@@ -643,6 +658,8 @@ function render(d){
         <div class="b"><div class="n">${d.horloger}%</div><div class="l">victoires au temps</div></div>
         <div class="b"><div class="n">${d.drawRate}%</div><div class="l">nulles</div></div>
         <div class="b"><div class="n">${d.repertoire}</div><div class="l">ouvertures au répertoire</div></div>
+        <div class="b"><div class="n good">${d.knownRate}%</div><div class="l">ouvertures connues (théorie)</div></div>
+        <div class="b"><div class="n">${d.solidRate}%</div><div class="l">ouvertures solides / défensives</div></div>
         <div class="b"><div class="n ${d.worstStreak>=5?'bad':''}">${d.worstStreak}</div><div class="l">pire série de défaites / jour</div></div>
       </div>
     </div>
