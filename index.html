@@ -116,8 +116,15 @@
     font-size:120px;line-height:1;z-index:1;opacity:.92;
     filter:drop-shadow(0 10px 14px rgba(0,0,0,.35));
   }
+  .c-photo{
+    position:absolute;left:50%;top:96px;transform:translateX(-50%);
+    width:132px;height:132px;border-radius:50%;overflow:hidden;z-index:1;
+    box-shadow:0 8px 20px rgba(0,0,0,.4), inset 0 0 0 3px rgba(255,255,255,.55);
+    background:rgba(0,0,0,.15);
+  }
+  .c-photo img{width:100%;height:100%;object-fit:cover;display:block}
   .c-name{
-    position:relative;z-index:2;margin-top:172px;text-align:center;
+    position:relative;z-index:2;margin-top:168px;text-align:center;
     font-family:"Anton";font-size:30px;letter-spacing:.5px;text-transform:uppercase;
     white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
   }
@@ -126,10 +133,10 @@
     font-weight:700;font-size:13px;letter-spacing:1px;margin-top:-2px;opacity:.92;
   }
   .c-rule{height:2px;background:currentColor;opacity:.25;margin:9px 6px;position:relative;z-index:2}
-  .c-stats{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:5px 22px;padding:0 8px}
-  .stat{display:flex;align-items:baseline;gap:8px;font-family:"JetBrains Mono";font-size:13px;font-weight:700}
-  .stat b{font-family:"Anton";font-size:20px;min-width:30px;font-weight:400}
-  .stat span{opacity:.8;font-size:11px;letter-spacing:1px}
+  .c-stats{position:relative;z-index:2;display:grid;grid-template-columns:1fr 1fr;gap:6px 16px;padding:0 8px}
+  .stat{display:flex;align-items:baseline;gap:8px;font-family:"Chivo";font-weight:700}
+  .stat b{font-family:"Anton";font-size:22px;min-width:30px;font-weight:400}
+  .stat span{opacity:.82;font-size:12.5px;letter-spacing:.2px;font-weight:700}
   .c-foot{position:relative;z-index:2;margin-top:11px;padding:0 8px;display:flex;flex-direction:column;gap:3px;font-family:"JetBrains Mono";font-size:10px;font-weight:700}
   .c-foot div{display:flex;justify-content:space-between;opacity:.9}
   .c-foot .lab{opacity:.6;letter-spacing:1px}
@@ -157,6 +164,10 @@
   .ol .o .wr{font-family:"JetBrains Mono";font-weight:700}
   .note{font-size:12px;color:var(--muted);line-height:1.5}
   .note b{color:var(--acc2)}
+  .arche-card{background:linear-gradient(135deg,#15110a,#0c1016);border-color:#3a2f12}
+  .arche-title{font-family:"Anton";font-size:34px;color:var(--acc);letter-spacing:.5px;line-height:1}
+  .arche-sub{font-family:"JetBrains Mono";font-size:13px;color:var(--ink);opacity:.75;margin:4px 0 10px}
+  .arche-why{font-size:13.5px;color:var(--ink);opacity:.92}
   a{color:var(--acc2)}
 </style>
 </head>
@@ -315,6 +326,7 @@ async function run(){
 
     setStatus("analyse…"); setBar(86);
     const data = analyse(user, games, profile, stats);
+    data.avatar = await loadAvatar(profile.avatar);
     render(data);
     setStatus(`carte générée sur ${games.length} parties · ${data.tcLabel}`); setBar(100);
     setTimeout(hideBar,700);
@@ -366,10 +378,12 @@ function analyse(user, games, profile, stats){
     // fianchetto
     if(hasFianchetto(g.pgn,iAmWhite)) fianchetto++;
 
-    // opponents
-    const on = you.username;
-    opp[on] = opp[on] || {n:0,w:0,l:0};
-    opp[on].n++; if(res==="W")opp[on].w++; else if(res==="L")opp[on].l++;
+    // opponents — uniquement parties CLASSÉES (exclut bots, coachs, parties casual)
+    if(g.rated){
+      const on = you.username;
+      opp[on] = opp[on] || {n:0,w:0,l:0};
+      opp[on].n++; if(res==="W")opp[on].w++; else if(res==="L")opp[on].l++;
+    }
 
     // per day for tilt
     const t = (g.end_time||0)*1000;
@@ -447,7 +461,7 @@ function analyse(user, games, profile, stats){
 
   // ---- archétype ----
   const arche = pickArchetype({
-    horloger,fianchRate,drawRate,mateRate,MTL:S.MTL,winRate,
+    horloger,fianchRate,drawRate,mateRate,MTL:S.MTL,winRate,worstStreak,repertoire,
     lifetime,dominance,gambitRate,moves,bulletShare,DEF:S.DEF
   });
 
@@ -464,7 +478,7 @@ function analyse(user, games, profile, stats){
   return {
     user, name:(profile.name||user), country:flag(profile.country),
     elo, eloLabel, OVR, tier, S, arche, piece,
-    W,L,D,total,winRate, lifetime, modeLabel,
+    W,L,D,total,winRate, lifetime, modeLabel, sampleRate:pct(total,lifetime),
     whiteWR:pct(whiteW,whiteN), blackWR:pct(blackW,blackN),
     horloger, drawRate, fianchRate, worstStreak, repertoire, dominance, gambitRate, moves,
     favOpenings, nemesis, pigeon,
@@ -484,25 +498,45 @@ function flag(code){
   if(!/^[A-Z]{2}$/.test(cc)) return "♟";
   return String.fromCodePoint(...[...cc].map(c=>0x1F1E6+c.charCodeAt(0)-65));
 }
+// charge l'avatar et le convertit en dataURL (export PNG propre). null si CORS bloqué -> fallback pièce
+function loadAvatar(url){
+  return new Promise(res=>{
+    if(!url){ res(null); return; }
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    const to = setTimeout(()=>res(null), 6000);
+    img.onload = ()=>{
+      clearTimeout(to);
+      try{
+        const cv = document.createElement("canvas");
+        cv.width = img.naturalWidth; cv.height = img.naturalHeight;
+        cv.getContext("2d").drawImage(img,0,0);
+        res(cv.toDataURL("image/png"));
+      }catch(_){ res(null); }
+    };
+    img.onerror = ()=>{ clearTimeout(to); res(null); };
+    img.src = url;
+  });
+}
 
 function pickArchetype(m){
   const c=[];
-  if(m.horloger>=40)    c.push({score:m.horloger,            t:"L'HORLOGER",     d:"gagne au flag"});
-  if(m.drawRate>=20)    c.push({score:m.drawRate*2,          t:"LE PACIFISTE",   d:"roi de la nulle"});
-  if(m.fianchRate>=30)  c.push({score:m.fianchRate,          t:"LE SNIPER",      d:"fou en fianchetto"});
-  if(m.mateRate>=45)    c.push({score:m.mateRate,            t:"LE BOUCHER",     d:"mate au lieu d'attendre l'abandon"});
-  if(m.MTL<=40)         c.push({score:(50-m.MTL)*2,          t:"LE TILTÉ",       d:"enchaîne les défaites"});
-  if(m.winRate>=58)     c.push({score:m.winRate,             t:"LE ROULEUR",     d:"écrase tout"});
-  if(m.gambitRate>=20)  c.push({score:m.gambitRate*1.4,      t:"LE GAMBITEUR",   d:"sacrifie pour l'attaque"});
-  if(m.dominance>=45)   c.push({score:m.dominance,           t:"LE MONOMANIAQUE",d:"joue toujours la même ouverture"});
-  if(m.repertoire>=18)  c.push({score:m.repertoire*2,        t:"LE THÉORICIEN",  d:"répertoire de bibliothèque"});
-  if(m.lifetime>=8000)  c.push({score:60+m.lifetime/500,     t:"L'ADDICT",       d:"vit sur l'échiquier"});
-  if(m.moves>=55)       c.push({score:m.moves,               t:"LE MARATHONIEN", d:"joue des parties à rallonge"});
-  if(m.moves<=22 && m.total>10) c.push({score:(40-m.moves)*2,t:"LE SPEEDRUNNER", d:"parties expédiées"});
-  if(m.bulletShare>=70) c.push({score:m.bulletShare,         t:"LE FLAMBEUR",    d:"accro au bullet"});
-  if(m.DEF>=82 && m.drawRate>=12) c.push({score:m.DEF,       t:"LE MUR",         d:"increvable, ne perd jamais"});
-  if(m.winRate<=38)     c.push({score:(50-m.winRate)*1.5,    t:"LE PUNCHING-BALL",d:"sert de cible d'entraînement"});
-  if(!c.length) return {t:"L'ÉQUILIBRISTE", d:"ni chaud ni froid"};
+  if(m.horloger>=40)    c.push({score:m.horloger,            t:"L'HORLOGER",     d:"gagne au flag",                       why:`${m.horloger}% de tes victoires sont gagnées au temps (l'adversaire tombe à zéro)`});
+  if(m.drawRate>=20)    c.push({score:m.drawRate*2,          t:"LE PACIFISTE",   d:"roi de la nulle",                     why:`${m.drawRate}% de tes parties finissent par une nulle`});
+  if(m.fianchRate>=30)  c.push({score:m.fianchRate,          t:"LE SNIPER",      d:"fou en fianchetto",                   why:`tu développes un fou en fianchetto dans ${m.fianchRate}% de tes parties`});
+  if(m.mateRate>=45)    c.push({score:m.mateRate,            t:"LE BOUCHER",     d:"va au mat",                           why:`tu termines au mat dans ${m.mateRate}% de tes victoires au lieu de laisser l'adversaire abandonner`});
+  if(m.MTL<=40)         c.push({score:(50-m.MTL)*2,          t:"LE TILTÉ",       d:"enchaîne les défaites",               why:`ta pire série fait ${m.worstStreak} défaites d'affilée en une seule journée`});
+  if(m.winRate>=58)     c.push({score:m.winRate,             t:"LE ROULEUR",     d:"écrase tout",                         why:`${m.winRate}% de victoires sur les parties analysées`});
+  if(m.gambitRate>=20)  c.push({score:m.gambitRate*1.4,      t:"LE GAMBITEUR",   d:"sacrifie pour l'attaque",             why:`${m.gambitRate}% de tes parties sont des gambits (sacrifice de pion dès l'ouverture)`});
+  if(m.dominance>=45)   c.push({score:m.dominance,           t:"LE MONOMANIAQUE",d:"toujours la même ouverture",          why:`ton ouverture fétiche représente ${m.dominance}% de toutes tes parties`});
+  if(m.repertoire>=18)  c.push({score:m.repertoire*2,        t:"LE THÉORICIEN",  d:"répertoire de bibliothèque",          why:`${m.repertoire} ouvertures différentes dans ton répertoire`});
+  if(m.lifetime>=8000)  c.push({score:60+m.lifetime/500,     t:"L'ADDICT",       d:"vit sur l'échiquier",                 why:`${m.lifetime.toLocaleString("fr-FR")} parties jouées au total`});
+  if(m.moves>=55)       c.push({score:m.moves,               t:"LE MARATHONIEN", d:"parties à rallonge",                  why:`tes parties durent ${m.moves} coups en moyenne`});
+  if(m.moves<=22 && m.total>10) c.push({score:(40-m.moves)*2,t:"LE SPEEDRUNNER", d:"parties expédiées",                   why:`tes parties ne durent que ${m.moves} coups en moyenne`});
+  if(m.bulletShare>=70) c.push({score:m.bulletShare,         t:"LE FLAMBEUR",    d:"accro au bullet",                     why:`${m.bulletShare}% de tes parties sont du bullet`});
+  if(m.DEF>=82 && m.drawRate>=12) c.push({score:m.DEF,       t:"LE MUR",         d:"increvable",                          why:`tu perds très rarement et tu sauves beaucoup de positions (${m.drawRate}% de nulles)`});
+  if(m.winRate<=38)     c.push({score:(50-m.winRate)*1.5,    t:"LE PUNCHING-BALL",d:"cible d'entraînement",               why:`seulement ${m.winRate}% de victoires sur les parties analysées`});
+  if(!c.length) return {t:"L'ÉQUILIBRISTE", d:"ni chaud ni froid", why:"aucune stat ne ressort de façon extrême, t'as un profil polyvalent"};
   c.sort((a,b)=>b.score-a.score);
   return c[0];
 }
@@ -521,14 +555,16 @@ function render(d){
         <div class="c-tier" style="margin-top:6px">ELO ${d.elo} ${d.eloLabel!=="—"?"· "+d.eloLabel:""}</div>
       </div>
     </div>
-    <div class="c-piece">${d.piece}</div>
+    ${d.avatar
+      ? `<div class="c-photo"><img src="${d.avatar}" alt=""></div>`
+      : `<div class="c-piece">${d.piece}</div>`}
     <div class="c-name">${esc(d.name).slice(0,16)}</div>
     <div class="c-archetype">${d.arche.t} · ${d.arche.d}</div>
     <div class="c-rule"></div>
     <div class="c-stats">
-      ${stat("TAC",d.S.TAC)}${stat("OUV",d.S.OUV)}
-      ${stat("ATT",d.S.ATT)}${stat("TMP",d.S.TMP)}
-      ${stat("DEF",d.S.DEF)}${stat("MTL",d.S.MTL)}
+      ${stat("tactique",d.S.TAC)}${stat("ouvertures",d.S.OUV)}
+      ${stat("attaque",d.S.ATT)}${stat("rythme",d.S.TMP)}
+      ${stat("défense",d.S.DEF)}${stat("mental",d.S.MTL)}
     </div>
     <div class="c-foot">
       <div><span class="lab">NÉMÉSIS</span><span>${d.nemesis?esc(d.nemesis.nm):"—"}</span></div>
@@ -541,6 +577,12 @@ function render(d){
 
   // breakdown
   $("breakdown").innerHTML = `
+    <div class="bd-card arche-card">
+      <h3>ton archétype</h3>
+      <div class="arche-title">${d.arche.t}</div>
+      <div class="arche-sub">« ${d.arche.d} »</div>
+      <p class="note arche-why">${esc(d.arche.why)}.</p>
+    </div>
     <div class="bd-card">
       <h3>le détail (vrai data)</h3>
       <div class="kv">
@@ -562,13 +604,14 @@ function render(d){
       </div>
     </div>
     <div class="bd-card">
-      <h3>tête à tête</h3>
+      <h3>tête à tête (parties classées only)</h3>
       <div class="ol">
         <div class="o"><span class="nm">😤 némésis : <b>${d.nemesis?esc(d.nemesis.nm):"aucun"}</b></span><span class="wr">${d.nemesis?`${d.nemesis.l}D / ${d.nemesis.n}`:""}</span></div>
         <div class="o"><span class="nm">🐦 pigeon : <b>${d.pigeon?esc(d.pigeon.nm):"aucun"}</b></span><span class="wr">${d.pigeon?`${d.pigeon.w}V / ${d.pigeon.n}`:""}</span></div>
       </div>
-      <p class="note" style="margin-top:12px">les stats <b>arnaque / choke / blunder précoce</b> demandent une éval moteur (Stockfish) → pas dispo via l'API seule. on peut les rajouter en option plus tard côté navigateur.</p>
+      <p class="note" style="margin-top:10px">les bots et parties d'entraînement (non classées) sont exclus du calcul.</p>
     </div>
+    <p class="note" style="text-align:center">échantillon analysé : <b>${d.total.toLocaleString("fr-FR")}</b> parties récentes sur ${d.lifetime.toLocaleString("fr-FR")} au total (~${d.sampleRate}%) · les stats moteur (arnaque / choke / blunder) nécessitent Stockfish ou l'API lichess.</p>
   `;
 }
 function stat(lab,v){ return `<div class="stat"><b>${v}</b><span>${lab}</span></div>`; }
