@@ -322,7 +322,6 @@ function analyse(user,games,profile,stats){
   let W=0,L=0,D=0, whiteW=0,whiteN=0,blackW=0,blackN=0;
   let timeWins=0,timeLosses=0,mateWins=0,resignWins=0,totalWins=0;
   let fianchetto=0,topBeat=0, winLong=0,lossLong=0, variantGames=0;
-  let accSum=0,accN=0;
   const openings={}, opp={}, byDay={}, chrono=[];
   const drawRes=new Set(["agreed","repetition","stalemate","insufficient","timevsinsufficient","50move"]);
 
@@ -346,7 +345,6 @@ function analyse(user,games,profile,stats){
     const op=openingFromGame(g); openings[op]=openings[op]||{n:0,w:0}; openings[op].n++; if(res==="W")openings[op].w++;
     if(hasFianchetto(g.pgn,iAmWhite))fianchetto++;
     if(g.rules&&g.rules!=="chess")variantGames++;
-    if(g.accuracies){ const a=iAmWhite?g.accuracies.white:g.accuracies.black; if(a){accSum+=a;accN++;} }
     if(g.rated){ const on=you.username; opp[on]=opp[on]||{n:0,w:0,l:0}; opp[on].n++; if(res==="W")opp[on].w++; else if(res==="L")opp[on].l++; }
     const t=(g.end_time||0)*1000, day=new Date(t).toISOString().slice(0,10);
     (byDay[day]=byDay[day]||[]).push({t,res}); chrono.push({t,res,rated:!!g.rated});
@@ -407,7 +405,6 @@ function analyse(user,games,profile,stats){
   const timeLossPct=pct(timeLosses,total);
   const fianchRate=pct(fianchetto,total);
   const variantRate=pct(variantGames,total);
-  const avgAccuracy=accN?Math.round(accSum/accN):null;
 
   // elo + pic (peak)
   const grab=k=>stats?.[k]?.last?.rating;
@@ -442,7 +439,6 @@ function analyse(user,games,profile,stats){
   if(lifetime>=5000)   pos.push({s:35+lifetime/1000, t:`${lifetime.toLocaleString("fr-FR")} parties au compteur`});
   if(mateRate>=40&&totalWins>=20) pos.push({s:mateRate, t:`${mateRate}% de victoires par mat`});
   if(peak>=1200 && peak-elo>=50 && peak-elo<250) pos.push({s:30+(peak-1000)/40, t:`a déjà touché ${peak} en pic`});
-  if(avgAccuracy>=80) pos.push({s:avgAccuracy, t:`${avgAccuracy}% de précision moyenne`});
   pos.sort((a,b)=>b.s-a.s);
   const neg=[];
   if(worstLossStreak>=4) neg.push({s:worstLossStreak*7, t:`${worstLossStreak} défaites d'affilée`});
@@ -466,7 +462,7 @@ function analyse(user,games,profile,stats){
     W,L,D,total,winRate,lifetime,modeLabel,sampleRate:pct(total,lifetime),
     whiteWR:pct(whiteW,whiteN),blackWR:pct(blackW,blackN),
     horloger,drawRate,worstStreak,repertoire,knownRate,solidRate,favWR,favOpenings,nemesis,punchball,
-    bestWinStreak,worstLossStreak,topBeat,variantRate,avgAccuracy
+    bestWinStreak,worstLossStreak,topBeat,variantRate
   };
 }
 
