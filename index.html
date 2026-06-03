@@ -54,9 +54,8 @@
   .bar.on{display:block}
   .bar > i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--acc2),var(--acc));transition:width .25s}
 
-  .testbut{margin:16px 0;text-align:center}
-  .testbut button{font-family:"JetBrains Mono";font-weight:700;font-size:13px;background:#2a0d0d;border:1px dashed #e2603f;color:#ffb4a4;padding:10px 18px;border-radius:10px;cursor:pointer}
-  .testbut button:hover{background:#3a1010}
+  .result.showcasing .dl{display:none}
+  .result.showcasing .card-stage .note{opacity:.7}
 
   .result{display:none;margin-top:24px}
   .result.on{display:grid;grid-template-columns:360px 1fr;gap:34px;align-items:start}
@@ -211,7 +210,7 @@
         <select id="tc"><option value="all" selected>toutes</option><option value="rapid">rapide</option><option value="blitz">blitz</option><option value="bullet">bullet</option></select>
       </div>
       <div class="field"><label for="depth">parties</label>
-        <select id="depth"><option value="500">500 (très rapide)</option><option value="1000" selected>1000 (rapide)</option><option value="2500">2500 (moyen)</option><option value="5000">5000 (lent)</option><option value="all">tout (variable)</option></select>
+        <select id="depth"><option value="500">500 (très rapide)</option><option value="1000">1000 (rapide)</option><option value="2500">2500 (moyen)</option><option value="5000">5000 (lent)</option><option value="all" selected>tout (variable)</option></select>
       </div>
       <button class="go" id="go">générer</button>
     </div>
@@ -233,9 +232,6 @@
     <div class="bar" id="barC"><i></i></div>
   </div>
 
-  <!-- TEST BUTTON haut - A SUPPRIMER -->
-  <div class="testbut"><button id="testTop">🧪 test but — voir le rendu du grade suivant</button></div>
-
   <div class="result" id="result">
     <div class="card-stage">
       <div class="flip" id="flip"><div class="flip-inner" id="flipInner">
@@ -254,9 +250,6 @@
   </div>
 
   <div id="compareResult"></div>
-
-  <!-- TEST BUTTON bas - A SUPPRIMER -->
-  <div class="testbut"><button id="testBot">🧪 test but — voir le rendu du grade suivant</button></div>
 
   <div class="foot-link">lusowall.github.io/chesscard</div>
 </div>
@@ -285,7 +278,7 @@ async function getJSON(url){ const r=await fetch(url,{headers:{"Accept":"applica
 
 /* PGN helpers */
 function tag(pgn,name){ const m=pgn&&pgn.match(new RegExp('\\['+name+'\\s+"([^"]*)"\\]')); return m?m[1]:""; }
-function openingFromGame(g){ const url=tag(g.pgn,"ECOUrl")||g.eco||""; let slug=url.split("/openings/")[1]||""; if(!slug)return tag(g.pgn,"ECO")||"Inconnue"; slug=slug.split(/[?#]/)[0]; let name=slug.replace(/-/g," ").replace(/\d.*$/,"").trim(); name=name.split(" ").slice(0,4).join(" "); return name||"Inconnue"; }
+function openingFromGame(g){ const url=tag(g.pgn,"ECOUrl")||g.eco||""; let slug=url.split("/openings/")[1]||""; if(!slug)return tag(g.pgn,"ECO")||"Inconnue"; slug=slug.split(/[?#]/)[0]; let name=slug.replace(/-/g," ").replace(/\d.*$/,"").trim(); name=name.split(" ").slice(0,2).join(" "); return name||"Inconnue"; }
 function sanMoves(pgn){ if(!pgn)return[]; let mt=pgn.replace(/\[[^\]]*\]/g,""); mt=mt.replace(/\{[^}]*\}/g," ").replace(/\$\d+/g," ").replace(/\d+\.(\.\.)?/g," ").replace(/(1-0|0-1|1\/2-1\/2|\*)/g," "); return mt.trim().split(/\s+/).filter(Boolean); }
 function clockSeconds(str){ const p=str.split(":").map(Number); let s=0; for(const x of p)s=s*60+x; return s; }
 function parseClocks(pgn){ const out=[]; const re=/\[%clk\s+([0-9:.]+)\]/g; let m; while((m=re.exec(pgn)))out.push(clockSeconds(m[1])); return out; }
@@ -333,7 +326,7 @@ async function run(){
   if(!user){ setStatus("euh il manque le pseudo",true); return; }
   if(user==="lusowall" && !window.__lw){ window.__lw=true; render(creatorData()); $("result").classList.add("on"); setStatus("✨ carte créateur — re-cherche lusowall pour les vraies stats"); $("result").scrollIntoView({behavior:"smooth",block:"start"}); return; }
   const tc=$("tc").value, dv=$("depth").value, target=dv==="all"?Infinity:parseInt(dv,10);
-  $("go").disabled=true; $("result").classList.remove("on");
+  $("go").disabled=true; $("result").classList.remove("on"); showcaseStop();
   setStatus("récupération du profil…"); setBar(4); showSkeleton();
   try{
     const data=await buildData(user,target,"status","bar",tc);
@@ -352,7 +345,7 @@ async function compareRun(){
   const a=$("userA").value.trim().toLowerCase(), b=$("userB").value.trim().toLowerCase();
   if(!a||!b){ setStatus("il faut deux pseudos",true,"statusC"); return; }
   const dv=$("depthC").value, target=dv==="all"?Infinity:parseInt(dv,10);
-  $("goCompare").disabled=true; $("compareResult").innerHTML="";
+  $("goCompare").disabled=true; $("compareResult").innerHTML=""; showcaseStop();
   setStatus("analyse des deux joueurs…",false,"statusC"); setBar(4,"barC");
   try{
     const dA=await buildData(a,target,"statusC","barC","all"); setBar(55,"barC");
@@ -456,9 +449,10 @@ function analyse(user,games,profile,stats,tcFilter){
   for(const o of opList){ if(/gambit/i.test(o.nm))gambitGames+=o.n; if(o.nm!=="Inconnue")knownGames+=o.n; if(solidRe.test(o.nm))solidGames+=o.n; }
   const gambitRate=pct(gambitGames,total), knownRate=pct(knownGames,total), solidRate=pct(solidGames,total);
   const playedGames=opList.filter(o=>o.n>=3).reduce((a,o)=>a+o.n,0); const playedRate=pct(playedGames,total);
-  const opSig=opList.filter(o=>o.n>=4);
-  const bestOpening=opSig.length?opSig.slice().sort((a,b)=>b.wr-a.wr)[0]:null;
-  const worstOpening=opSig.length?opSig.slice().sort((a,b)=>a.wr-b.wr)[0]:null;
+  let opPool=opList.filter(o=>o.n>=6); if(!opPool.length)opPool=opList.filter(o=>o.n>=3);
+  opPool=opPool.map(o=>({...o,adj:(o.wr*o.n+50*12)/(o.n+12)}));
+  const bestOpening=opPool.length?opPool.slice().sort((a,b)=>b.adj-a.adj||b.n-a.n)[0]:null;
+  const worstOpening=opPool.length?opPool.slice().sort((a,b)=>a.adj-b.adj||b.n-a.n)[0]:null;
 
   const oppList=Object.entries(opp).map(([nm,v])=>({nm,...v})).filter(o=>o.n>=3);
   let nemesis=null,punchball=null;
@@ -486,7 +480,7 @@ function analyse(user,games,profile,stats,tcFilter){
 
   const ei=pickEloInfo(stats,tcFilter), elo=ei.elo, eloLabel=ei.label;
   const peak=stats?.[ei.cat]?.best?.rating||elo;
-  let lifetime=0; for(const k of ["chess_rapid","chess_blitz","chess_bullet","chess_daily"]){const r=stats?.[k]?.record; if(r)lifetime+=(r.win||0)+(r.loss||0)+(r.draw||0);} if(!lifetime)lifetime=total;
+  let lifetime=0; for(const k of ["chess_rapid","chess_blitz","chess_bullet","chess_daily"]){const r=stats?.[k]?.record; if(r)lifetime+=(r.win||0)+(r.loss||0)+(r.draw||0);} lifetime=Math.max(lifetime,total);
   const tacticsR=stats?.tactics?.highest?.rating||null, puzzleBonus=tacticsR?clamp((tacticsR-elo)/60,-3,5):0;
 
   const base=eloBase(elo), OVR=base, adj=(d,c)=>clamp(Math.round(d),-c,c);
@@ -592,14 +586,15 @@ function cardHTML(d){
 function applyCard(el,d){ el.className="card "+d.tier; el.innerHTML=cardHTML(d); }
 
 function backHTML(d){
-  const rows=[["perf vs elo",(d.perfPerGame>0?"+":"")+d.perfPerGame+" /100"],["échecs donnés/partie",d.checksGiven],["coups en zeitnot",d.zeitnotRate!==null?d.zeitnotRate+"%":"—"],["winrate après défaite",d.postLossWR+"%"],["elo moyen adverse",d.avgOppElo||"—"],["ouvertures déjà jouées",(d.playedRate!=null?d.playedRate:d.knownRate)+"%"],["ouvertures solides",d.solidRate+"%"],["partie la + longue",(d.maxMoves||"—")+" coups"],["partie la + courte",(d.minMoves||"—")+" coups"],["série en cours",d.curStreak>=2?d.curStreak+(d.curRes==="W"?" V":" D"):"—"]];
+  const rows=[["perf vs elo",(d.perfPerGame>0?"+":"")+d.perfPerGame+" /100"],["échecs donnés/partie",d.checksGiven],["coups en zeitnot",d.zeitnotRate!==null?d.zeitnotRate+"%":"—"],["winrate après défaite",d.postLossWR+"%"],["elo moyen adverse",d.avgOppElo||"—"],["ouvertures déjà jouées",(d.playedRate!=null?d.playedRate:d.knownRate)+"%"],["partie la + longue",(d.maxMoves||"—")+" coups"],["partie la + courte",(d.minMoves||"—")+" coups"],["série en cours",d.curStreak>=2?d.curStreak+(d.curRes==="W"?" V":" D"):"—"]];
   return `<div class="c-top"><div class="c-ovr" style="font-size:30px">détail<small>${esc(d.name).slice(0,14)}</small></div><div class="c-meta">${d.tierName} · ${d.elo}</div></div>
     <div class="back-list">${rows.map(r=>`<div><span>${r[0]}</span><b>${esc(String(r[1]))}</b></div>`).join("")}</div>
     <div class="c-watermark" style="margin-top:auto">↻ recto · ${SITE}</div>`;
 }
 function render(d){
-  window.__last=d;
+  window.__last=d; realShown=true;
   document.body.className="theme-"+d.tier;
+  $("result").classList.remove("showcasing");
   $("flipInner").classList.remove("flipped");
   applyCard($("card"),d);
   const back=$("cardBack"); back.className="card back "+d.tier; back.innerHTML=backHTML(d);
@@ -827,13 +822,26 @@ function fakeData(){
     endTypes:{mat:rnd(20,60),abandon:rnd(20,50),temps:rnd(5,25),nulle:rnd(2,15),autre:rnd(0,5)},
     heat:Array.from({length:7},()=>Array.from({length:24},()=>rnd(0,8))),heatMax:8 };
 }
-function testCycle(){ const d=fakeData(); render(d); $("result").classList.add("on"); setStatus("RENDU TEST : "+d.tierName); }
+/* carrousel d'exemples (remplit le site, défile grade par grade) */
+let showcaseTimer=null, realShown=false;
+function showcaseStep(){
+  const d=fakeData(); window.__last=d;
+  document.body.className="theme-"+d.tier;
+  $("flipInner").classList.remove("flipped");
+  applyCard($("card"),d);
+  $("cardBack").className="card back "+d.tier; $("cardBack").innerHTML=backHTML(d);
+  animateCounters($("card"));
+  $("breakdown").innerHTML=`<div class="bd-card" style="text-align:center"><h3>exemple de carte · ${d.tierName}</h3><p class="note">chaque grade a son style et sa couleur — les cartes défilent du plus bas au plus haut elo.<br><b>tape ton pseudo chess.com en haut</b> pour générer la tienne ☝️</p></div>`;
+}
+function showcaseStart(){ showcaseStop(); $("result").classList.add("on","showcasing"); showcaseStep(); showcaseTimer=setInterval(showcaseStep,3600); }
+function showcaseStop(){ if(showcaseTimer){clearInterval(showcaseTimer);showcaseTimer=null;} $("result").classList.remove("showcasing"); }
 
 function setMode(mode){
   const solo=mode==="solo";
   $("modeSolo").classList.toggle("on",solo); $("modeCompare").classList.toggle("on",!solo);
   $("soloPanel").classList.toggle("hidden",!solo); $("comparePanel").classList.toggle("hidden",solo);
   $("result").style.display=solo?"":"none"; $("compareResult").style.display=solo?"none":"";
+  if(solo){ if(!realShown)showcaseStart(); } else { showcaseStop(); }
 }
 
 $("go").addEventListener("click",run);
@@ -848,12 +856,11 @@ $("goCompare").addEventListener("click",compareRun);
 $("userB").addEventListener("keydown",e=>{if(e.key==="Enter")compareRun();});
 $("modeSolo").addEventListener("click",()=>setMode("solo"));
 $("modeCompare").addEventListener("click",()=>setMode("compare"));
-$("testTop").addEventListener("click",testCycle);
-$("testBot").addEventListener("click",testCycle);
 
 (function(){ const p=new URLSearchParams(location.search), u=p.get("user"), vs=p.get("vs");
   if(u&&vs){ setMode("compare"); $("userA").value=u; $("userB").value=vs; compareRun(); }
-  else if(u){ $("user").value=u; run(); } })();
+  else if(u){ $("user").value=u; run(); }
+  else { showcaseStart(); } })();
 </script>
 </body>
 </html>
