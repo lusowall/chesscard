@@ -455,6 +455,7 @@ function analyse(user,games,profile,stats,tcFilter){
   const solidRe=/caro|fran|slav|petro|berlin|scandinav|stonewall|hippo|london|gambit declined|qgd|semi.?slav|philidor|exchange/i;
   for(const o of opList){ if(/gambit/i.test(o.nm))gambitGames+=o.n; if(o.nm!=="Inconnue")knownGames+=o.n; if(solidRe.test(o.nm))solidGames+=o.n; }
   const gambitRate=pct(gambitGames,total), knownRate=pct(knownGames,total), solidRate=pct(solidGames,total);
+  const playedGames=opList.filter(o=>o.n>=3).reduce((a,o)=>a+o.n,0); const playedRate=pct(playedGames,total);
   const opSig=opList.filter(o=>o.n>=4);
   const bestOpening=opSig.length?opSig.slice().sort((a,b)=>b.wr-a.wr)[0]:null;
   const worstOpening=opSig.length?opSig.slice().sort((a,b)=>a.wr-b.wr)[0]:null;
@@ -530,7 +531,7 @@ function analyse(user,games,profile,stats,tcFilter){
     elo, eloLabel, peak, base, OVR, tier:tier.key, tierName:tier.name, S, arche, piece, emblem:emblemOf(tier.key), flagship, feats,
     W,L,D,total,winRate,lifetime,modeLabel,signatureTC,sampleRate:pct(total,lifetime),
     whiteWR:pct(whiteW,whiteN),blackWR:pct(blackW,blackN),
-    horloger,drawRate,worstStreak,repertoire,knownRate,solidRate,favWR,favOpenings,bestOpening,worstOpening,nemesis,punchball,
+    horloger,drawRate,worstStreak,repertoire,knownRate,playedRate,solidRate,favWR,favOpenings,bestOpening,worstOpening,nemesis,punchball,
     bestWinStreak,worstLossStreak,curStreak,curRes,topBeat,variantRate,nightShare,avgOppElo,joinYear,eloSeries:eloSorted,
     heat,heatMax,maxMoves,minMoves:(minMoves===999?0:minMoves),endTypes,accountYears,upsetRate,
     checksGiven:Math.round(checksGiven*10)/10, perfPerGame:Math.round(perfPerGame*100), zeitnotRate, postLossWR, tiltDrop };
@@ -591,7 +592,7 @@ function cardHTML(d){
 function applyCard(el,d){ el.className="card "+d.tier; el.innerHTML=cardHTML(d); }
 
 function backHTML(d){
-  const rows=[["perf vs elo",(d.perfPerGame>0?"+":"")+d.perfPerGame+" /100"],["échecs donnés/partie",d.checksGiven],["coups en zeitnot",d.zeitnotRate!==null?d.zeitnotRate+"%":"—"],["winrate après défaite",d.postLossWR+"%"],["elo moyen adverse",d.avgOppElo||"—"],["ouvertures connues",d.knownRate+"%"],["ouvertures solides",d.solidRate+"%"],["partie la + longue",(d.maxMoves||"—")+" coups"],["partie la + courte",(d.minMoves||"—")+" coups"],["série en cours",d.curStreak>=2?d.curStreak+(d.curRes==="W"?" V":" D"):"—"]];
+  const rows=[["perf vs elo",(d.perfPerGame>0?"+":"")+d.perfPerGame+" /100"],["échecs donnés/partie",d.checksGiven],["coups en zeitnot",d.zeitnotRate!==null?d.zeitnotRate+"%":"—"],["winrate après défaite",d.postLossWR+"%"],["elo moyen adverse",d.avgOppElo||"—"],["ouvertures déjà jouées",(d.playedRate!=null?d.playedRate:d.knownRate)+"%"],["ouvertures solides",d.solidRate+"%"],["partie la + longue",(d.maxMoves||"—")+" coups"],["partie la + courte",(d.minMoves||"—")+" coups"],["série en cours",d.curStreak>=2?d.curStreak+(d.curRes==="W"?" V":" D"):"—"]];
   return `<div class="c-top"><div class="c-ovr" style="font-size:30px">détail<small>${esc(d.name).slice(0,14)}</small></div><div class="c-meta">${d.tierName} · ${d.elo}</div></div>
     <div class="back-list">${rows.map(r=>`<div><span>${r[0]}</span><b>${esc(String(r[1]))}</b></div>`).join("")}</div>
     <div class="c-watermark" style="margin-top:auto">↻ recto · ${SITE}</div>`;
@@ -630,12 +631,12 @@ function render(d){
         <div class="b"><div class="n">${d.modeLabel}</div><div class="l">mode préféré</div></div>
         <div class="b"><div class="n">${d.signatureTC||"—"}</div><div class="l">cadence signature</div></div>
         <div class="b"><div class="n gold">${d.winRate}%</div><div class="l">win rate global</div></div>
-        <div class="b"><div class="n ${d.perfPerGame>0?'good':d.perfPerGame<0?'bad':''}">${d.perfPerGame>0?'+':''}${d.perfPerGame}</div><div class="l">perf vs elo /100</div></div>
+        <div class="b" title="Score réel comparé à ce que ton elo prédisait face aux adversaires affrontés. +3 = tu fais 3 points/100 de mieux que prévu (tu surperformes ton classement). 0 = pile ton niveau."><div class="n ${d.perfPerGame>0?'good':d.perfPerGame<0?'bad':''}">${d.perfPerGame>0?'+':''}${d.perfPerGame}</div><div class="l">perf vs elo /100</div></div>
         <div class="b"><div class="n">${d.avgOppElo||"—"}</div><div class="l">elo moyen adversaires</div></div>
         <div class="b"><div class="n ${d.curRes==="W"?"good":d.curRes==="L"?"bad":""}">${cur}</div><div class="l">série en cours</div></div>
         <div class="b"><div class="n">${d.checksGiven}</div><div class="l">échecs donnés / partie</div></div>
-        <div class="b"><div class="n">${d.zeitnotRate!==null?d.zeitnotRate+"%":"—"}</div><div class="l">coups en zeitnot</div></div>
-        <div class="b"><div class="n good">${d.knownRate}%</div><div class="l">ouvertures connues</div></div>
+        <div class="b" title="Part de tes coups joués avec très peu de temps à la pendule (moins de 15s en blitz/rapide, 5s en bullet). Élevé = tu joues souvent dans l'urgence."><div class="n">${d.zeitnotRate!==null?d.zeitnotRate+"%":"—"}</div><div class="l">coups en zeitnot</div></div>
+        <div class="b" title="Part de tes parties jouées avec une ouverture que tu joues régulièrement (≥3 fois). Élevé = vrai répertoire."><div class="n good">${d.playedRate}%</div><div class="l">ouvertures déjà jouées</div></div>
         <div class="b"><div class="n">${d.postLossWR}%</div><div class="l">winrate après défaite</div></div>
         <div class="b"><div class="n ${d.worstStreak>=5?"bad":""}">${d.worstStreak}</div><div class="l">pire série déf. / jour</div></div>
       </div>
@@ -792,7 +793,7 @@ function creatorData(){
     footRows:[["♥ MERCI","BEAUCOUP"],["AUX","UTILISATEURS"],["STATUT","FONDATEUR"],["PRIX","0€ (gratuit)"]],
     W:999,L:0,D:0,total:0,winRate:100,lifetime:99999,modeLabel:"TOUTES",sampleRate:100,
     whiteWR:100,blackWR:100,avgOppElo:3000,curStreak:99,curRes:"W",
-    horloger:99,drawRate:0,worstStreak:0,repertoire:99,knownRate:100,solidRate:50,favWR:100,
+    horloger:99,drawRate:0,worstStreak:0,repertoire:99,knownRate:100,playedRate:95,solidRate:50,favWR:100,
     favOpenings:[{nm:"Toutes les ouvertures",n:999,wr:100}], nemesis:null,punchball:null,
     bestWinStreak:99,worstLossStreak:0,topBeat:3500,variantRate:50,nightShare:80,accountYears:5,upsetRate:50,
     maxMoves:120,minMoves:7,endTypes:{mat:55,abandon:30,temps:8,nulle:5,autre:2},heat:null,heatMax:0,
@@ -818,7 +819,7 @@ function fakeData(){
     W:rnd(80,140),L:rnd(50,90),D:rnd(5,25),total:200,winRate:rnd(42,62),lifetime:rnd(500,40000),
     modeLabel:["BULLET","BLITZ","RAPIDE"][rnd(0,2)],sampleRate:rnd(1,40),
     whiteWR:rnd(45,60),blackWR:rnd(40,58),avgOppElo:elo+rnd(-60,60),curStreak:rnd(0,7),curRes:["W","L"][rnd(0,1)],
-    horloger:rnd(10,55),drawRate:rnd(2,20),worstStreak:rnd(2,8),repertoire:rnd(8,35),knownRate:rnd(70,98),solidRate:rnd(5,55),favWR:rnd(45,65),
+    horloger:rnd(10,55),drawRate:rnd(2,20),worstStreak:rnd(2,8),repertoire:rnd(8,35),knownRate:rnd(70,98),playedRate:rnd(30,82),solidRate:rnd(5,55),favWR:rnd(45,65),
     favOpenings:[{nm:"Sicilian Defense",n:rnd(20,60),wr:rnd(45,65)},{nm:"Caro Kann Defense",n:rnd(10,30),wr:rnd(40,60)},{nm:"Queens Gambit",n:rnd(8,20),wr:rnd(40,60)}],
     nemesis:{nm:"DarkKnight_99",l:rnd(4,9),n:rnd(10,15)}, punchball:{nm:"easyfood42",w:rnd(5,10),n:rnd(8,12)},
     checksGiven:(rnd(8,22)/10),perfPerGame:rnd(-8,8),zeitnotRate:rnd(5,40),postLossWR:rnd(35,60),
