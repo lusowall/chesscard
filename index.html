@@ -23,6 +23,7 @@
   body.theme-platine{--t1:#1f3a52;--t2:#163048;--t3:#0e2233;--acc2:#5fb0e6}
   body.theme-monstre{--t1:#4a0d18;--t2:#2e0810;--t3:#1a040a;--acc2:#ff5a6e}
   body.theme-legend{--t1:#23316b;--t2:#161f44;--t3:#0c1430;--acc2:#f0d98a}
+  body.theme-creator{--t1:#3a1d6e;--t2:#1f1142;--t3:#120a28;--acc2:#c89bff}
 
   header.hd{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
   .logo{font-family:"Anton";font-size:clamp(34px,6vw,58px);letter-spacing:1px;line-height:.9}
@@ -77,9 +78,19 @@
   .card.monstre{background:linear-gradient(160deg,#4a0f17 0%,#23070f 52%,#07030a 100%);color:#ffd9d0;box-shadow:0 30px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,90,110,.35),0 0 34px rgba(220,30,50,.4)}
   .card.legend{background:linear-gradient(160deg,#2b3b6e 0%,#101a3c 48%,#05060f 100%);color:#f4efda;box-shadow:0 30px 60px rgba(0,0,0,.6),inset 0 0 0 2px rgba(212,175,55,.6),0 0 40px rgba(120,150,230,.45)}
   .card.legend::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(1.5px 1.5px at 20% 25%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 70% 18%,#ffe9a8 50%,transparent),radial-gradient(1px 1px at 45% 40%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 82% 55%,#cfe0ff 50%,transparent),radial-gradient(1px 1px at 30% 62%,#fff 50%,transparent);opacity:.8}
+  .card.creator{background:linear-gradient(160deg,#1c1038 0%,#0b0a1c 46%,#050409 100%);color:#f6ecff;box-shadow:0 30px 60px rgba(0,0,0,.6),inset 0 0 0 2px rgba(255,215,90,.7),0 0 30px rgba(180,90,255,.5),0 0 64px rgba(70,200,255,.32)}
+  .card.creator::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(125deg,rgba(255,80,210,.20),rgba(120,90,255,.12) 30%,rgba(60,210,255,.16) 55%,rgba(84,255,170,.12) 75%,rgba(255,225,80,.18));animation:holo 9s linear infinite}
+  .card.creator::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.4) 48%,transparent 60%);mix-blend-mode:screen;opacity:.55}
+  @keyframes holo{0%{filter:hue-rotate(0deg)}100%{filter:hue-rotate(360deg)}}
+  .card.creator .c-archetype{color:#ffd86b}
+  .card.creator .c-title{color:#ffd86b;text-shadow:0 1px 4px rgba(0,0,0,.5)}
   .card.emeraude .c-archetype{color:#bff7da}.card.monstre .c-archetype{color:#ff8a98}.card.platine .c-archetype{color:#0c3a63}.card.legend .c-archetype{color:#f0d98a}.card.troll .c-archetype{color:#0a3d22}
   .card::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.26) 48%,transparent 58%);mix-blend-mode:screen;opacity:.5}
   .card.exporting::after{opacity:.35}
+  .card.emeraude::after,.card.platine::after,.card.monstre::after,.card.legend::after{animation:sweep 4.5s ease-in-out infinite}
+  .card.exporting::after{animation:none!important;transform:none!important}
+  @keyframes sweep{0%,100%{transform:translateX(-32%);opacity:.32}50%{transform:translateX(32%);opacity:.62}}
+  .c-emblem{position:absolute;left:0;right:0;top:330px;text-align:center;font-size:230px;line-height:1;z-index:1;opacity:.06;pointer-events:none;user-select:none}
 
   .c-top{display:flex;justify-content:space-between;align-items:flex-start}
   .c-ovr{font-family:"Anton";font-size:60px;line-height:.8}
@@ -170,6 +181,7 @@
     </div>
     <div class="status" id="status"></div>
     <div class="bar" id="bar"><i></i></div>
+    <button id="random" style="margin-top:12px;font-family:'JetBrains Mono';font-weight:700;font-size:12px;background:transparent;border:1px dashed var(--acc2);color:var(--acc2);padding:9px 14px;border-radius:9px;cursor:pointer">🎲 joueur au hasard</button>
   </div>
 
   <div class="panel hidden" id="comparePanel">
@@ -193,6 +205,7 @@
       <div class="card" id="card"></div>
       <div class="dl">
         <button id="png">⬇ télécharger PNG</button>
+        <button id="banner">⬇ bannière</button>
         <button id="copy">⧉ copier l'image</button>
         <button id="link">🔗 copier le lien</button>
       </div>
@@ -223,7 +236,7 @@ const TIERS=[
 ];
 function tierOf(elo){ return TIERS.find(t=>elo>=t.min&&elo<=t.max)||TIERS[0]; }
 function eloBase(elo){ return clamp(Math.round(32+elo*0.0223),28,99); }
-const TIERCOL={troll:"#ff3aa5",bronze:"#cd874a",argent:"#aab6c2",or:"#f4cf52",emeraude:"#1fae6b",platine:"#4f9ee6",monstre:"#ff5a6e",legend:"#f0d98a"};
+const TIERCOL={creator:"#d9b3ff",troll:"#ff3aa5",bronze:"#cd874a",argent:"#aab6c2",or:"#f4cf52",emeraude:"#1fae6b",platine:"#4f9ee6",monstre:"#ff5a6e",legend:"#f0d98a"};
 
 function setStatus(t,err,id){ const s=$(id||"status"); s.textContent=t; s.className="status"+(err?" err":""); }
 function setBar(p,id){ const b=$(id||"bar"); b.classList.add("on"); b.querySelector("i").style.width=clamp(p,0,100)+"%"; }
@@ -237,6 +250,22 @@ function sanMoves(pgn){ if(!pgn)return[]; let mt=pgn.replace(/\[[^\]]*\]/g,""); 
 function clockSeconds(str){ const p=str.split(":").map(Number); let s=0; for(const x of p)s=s*60+x; return s; }
 function parseClocks(pgn){ const out=[]; const re=/\[%clk\s+([0-9:.]+)\]/g; let m; while((m=re.exec(pgn)))out.push(clockSeconds(m[1])); return out; }
 function baseTimeOf(tc){ if(!tc||tc.indexOf("/")>=0)return null; const b=parseInt(tc.split("+")[0],10); return isNaN(b)?null:b; }
+function fmtTC(tc){ if(!tc||tc.indexOf("/")>=0)return "corresp."; const p=tc.split("+"); const b=parseInt(p[0],10), inc=p[1]?parseInt(p[1],10):0; if(isNaN(b))return "—"; const m=b/60; const mm=Number.isInteger(m)?m:(+(m).toFixed(1)); return mm+"+"+inc; }
+const EMBLEM={troll:"🤡",bronze:"♟",argent:"♞",or:"♝",emeraude:"♜",platine:"♛",monstre:"♚",legend:"♔",creator:"👑"};
+function emblemOf(t){ return EMBLEM[t]||"♟"; }
+function sparkline(vals,color){
+  if(!vals||vals.length<2) return `<div class="note">pas assez de données</div>`;
+  const w=480,h=90,pad=6, min=Math.min(...vals),max=Math.max(...vals),rng=(max-min)||1;
+  const pts=vals.map((v,i)=>[pad+i/(vals.length-1)*(w-2*pad), h-pad-(v-min)/rng*(h-2*pad)]);
+  const path=pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
+  const area=`${pad},${h-pad} ${path} ${(w-pad)},${h-pad}`;
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" preserveAspectRatio="none" style="display:block">
+    <polygon points="${area}" fill="${color}22"/>
+    <polyline points="${path}" fill="none" stroke="${color}" stroke-width="2"/>
+    <text x="2" y="12" font-size="11" fill="#8893a3" font-family="monospace">${max}</text>
+    <text x="2" y="${h-2}" font-size="11" fill="#8893a3" font-family="monospace">${min}</text>
+  </svg>`;
+}
 function flag(code){ if(!code)return "🏳️"; const cc=code.split("/").pop(); if(!/^[A-Z]{2}$/.test(cc))return "🏳️"; return String.fromCodePoint(...[...cc].map(c=>0x1F1E6+c.charCodeAt(0)-65)); }
 function loadAvatar(url){ return new Promise(res=>{ if(!url){res(null);return;} const img=new Image(); img.crossOrigin="anonymous"; const to=setTimeout(()=>res(null),6000); img.onload=()=>{clearTimeout(to);try{const cv=document.createElement("canvas");cv.width=img.naturalWidth;cv.height=img.naturalHeight;cv.getContext("2d").drawImage(img,0,0);res(cv.toDataURL("image/png"));}catch(_){res(null);}}; img.onerror=()=>{clearTimeout(to);res(null);}; img.src=url; }); }
 
@@ -314,7 +343,7 @@ function analyse(user,games,profile,stats,tcFilter){
   let myChecks=0,oppChecks=0, movesSum=0, lossMovesSum=0,lossN=0, fastMateLoss=0;
   let zeitnotMoves=0,clockMoves=0, finalRatioSum=0,finalRatioN=0;
   let perfSum=0,perfN=0;
-  const openings={}, opp={}, byDay={}, chrono=[];
+  const openings={}, opp={}, byDay={}, chrono=[], eloSeries=[], tcCtrl={};
   const drawRes=new Set(["agreed","repetition","stalemate","insufficient","timevsinsufficient","50move"]);
 
   for(const g of games){
@@ -351,6 +380,8 @@ function analyse(user,games,profile,stats,tcFilter){
 
     const op=openingFromGame(g); openings[op]=openings[op]||{n:0,w:0}; openings[op].n++; if(res==="W")openings[op].w++;
     if(g.rules&&g.rules!=="chess")variantGames++;
+    if(g.time_control)tcCtrl[g.time_control]=(tcCtrl[g.time_control]||0)+1;
+    if(g.rated&&me.rating)eloSeries.push({t:(g.end_time||0)*1000,r:me.rating});
     if(g.rated){ const on=you.username; opp[on]=opp[on]||{n:0,w:0,l:0}; opp[on].n++; if(res==="W")opp[on].w++; else if(res==="L")opp[on].l++; }
     const t=(g.end_time||0)*1000, dt=new Date(t), day=dt.toISOString().slice(0,10), h=dt.getHours();
     if(h>=22||h<6)nightGames++;
@@ -378,6 +409,9 @@ function analyse(user,games,profile,stats,tcFilter){
   const solidRe=/caro|fran|slav|petro|berlin|scandinav|stonewall|hippo|london|gambit declined|qgd|semi.?slav|philidor|exchange/i;
   for(const o of opList){ if(/gambit/i.test(o.nm))gambitGames+=o.n; if(o.nm!=="Inconnue")knownGames+=o.n; if(solidRe.test(o.nm))solidGames+=o.n; }
   const gambitRate=pct(gambitGames,total), knownRate=pct(knownGames,total), solidRate=pct(solidGames,total);
+  const opSig=opList.filter(o=>o.n>=4);
+  const bestOpening=opSig.length?opSig.slice().sort((a,b)=>b.wr-a.wr)[0]:null;
+  const worstOpening=opSig.length?opSig.slice().sort((a,b)=>a.wr-b.wr)[0]:null;
 
   const oppList=Object.entries(opp).map(([nm,v])=>({nm,...v})).filter(o=>o.n>=3);
   let nemesis=null,punchball=null;
@@ -386,7 +420,13 @@ function analyse(user,games,profile,stats,tcFilter){
   const tcCount={}; for(const g of games){const k=g.time_class||"?";tcCount[k]=(tcCount[k]||0)+1;}
   const modeKey=Object.entries(tcCount).sort((a,b)=>b[1]-a[1])[0]?.[0]||"?";
   const modeLabel={bullet:"BULLET",blitz:"BLITZ",rapid:"RAPIDE",daily:"CORRESP."}[modeKey]||"—";
+  const blitzShare=pct(tcCount.blitz||0,total);
+  const sigKey=Object.entries(tcCtrl).sort((a,b)=>b[1]-a[1])[0]?.[0]||null;
+  const signatureTC=fmtTC(sigKey);
   const moves=total?Math.round(movesSum/total):40;
+  const eloSorted=eloSeries.slice().sort((a,b)=>a.t-b.t).map(x=>x.r);
+  const joinYear=profile.joined?new Date(profile.joined*1000).getFullYear():null;
+  const accountYears=profile.joined?Math.max(0,(Date.now()/1000-profile.joined)/31557600):0;
 
   const horloger=pct(timeWins,Math.max(1,totalWins)), mateRate=pct(mateWins,Math.max(1,totalWins));
   const decisiveWinRate=pct(mateWins+resignWins,Math.max(1,totalWins));
@@ -413,7 +453,7 @@ function analyse(user,games,profile,stats,tcFilter){
     MTL: clamp(base+adj(-tiltDrop*0.6 + (bestWinStreak-4)*1.5 - (elo<2000?flagRate*0.12:0), 15),12,99)
   };
 
-  const arche=pickArchetype({total,winRate,lossRate,drawRate,mateRate,horloger,fianchRate,gambitRate,dominance,repertoire,knownRate,solidRate,lifetime,moves,bulletShare:pct(tcCount.bullet||0,total),variantRate,nightShare,upsetRate});
+  const arche=pickArchetype({total,winRate,lossRate,drawRate,mateRate,horloger,fianchRate,gambitRate,dominance,repertoire,knownRate,solidRate,lifetime,moves,bulletShare:pct(tcCount.bullet||0,total),blitzShare,variantRate,nightShare,upsetRate,accountYears,joinYear});
 
   const pos=[];
   if(bestWinStreak>=5) pos.push({s:bestWinStreak*7,t:`${bestWinStreak} victoires d'affilée`});
@@ -441,11 +481,11 @@ function analyse(user,games,profile,stats,tcFilter){
 
   const tier=tierOf(elo), piece=(tier.key==="troll")?"🤡":(whiteN>=blackN?"♔":"♚");
   return { user, name:(profile.name||user), country:flag(profile.country), title:(profile.title||""),
-    elo, eloLabel, peak, base, OVR, tier:tier.key, tierName:tier.name, S, arche, piece, flagship, feats,
-    W,L,D,total,winRate,lifetime,modeLabel,sampleRate:pct(total,lifetime),
+    elo, eloLabel, peak, base, OVR, tier:tier.key, tierName:tier.name, S, arche, piece, emblem:emblemOf(tier.key), flagship, feats,
+    W,L,D,total,winRate,lifetime,modeLabel,signatureTC,sampleRate:pct(total,lifetime),
     whiteWR:pct(whiteW,whiteN),blackWR:pct(blackW,blackN),
-    horloger,drawRate,worstStreak,repertoire,knownRate,solidRate,favWR,favOpenings,nemesis,punchball,
-    bestWinStreak,worstLossStreak,curStreak,curRes,topBeat,variantRate,nightShare,avgOppElo,
+    horloger,drawRate,worstStreak,repertoire,knownRate,solidRate,favWR,favOpenings,bestOpening,worstOpening,nemesis,punchball,
+    bestWinStreak,worstLossStreak,curStreak,curRes,topBeat,variantRate,nightShare,avgOppElo,joinYear,eloSeries:eloSorted,
     checksGiven:Math.round(checksGiven*10)/10, perfPerGame:Math.round(perfPerGame*100), zeitnotRate, postLossWR, tiltDrop };
 }
 
@@ -467,6 +507,9 @@ function pickArchetype(m){
   add(hi(m.solidRate,12,40)+(m.lossRate<=38?0.2:0),"LE MUR","indéboulonnable",`${m.solidRate}% d'ouvertures solides et tu perds peu`);
   add(hi(m.variantRate,3,25),"L'EXOTIQUE","fan de variantes",`${m.variantRate}% de parties en variantes (960, roi de la colline…)`);
   add(hi(m.nightShare,18,45),"LE NOCTAMBULE","joue dans le noir",`${m.nightShare}% de tes parties entre 22h et 6h`);
+  add(hi(m.blitzShare,30,70),"LE BLITZER","vit en 3+0",`${m.blitzShare}% de tes parties sont du blitz`);
+  add(hi(m.accountYears,2,9),"LE VÉTÉRAN","ancien de la plateforme",m.joinYear?`joue sur chess.com depuis ${m.joinYear}`:`compte ancien`);
+  add((hi(m.moves,40,52)+hi(m.winRate,50,57))/2,"LE STRATÈGE","patient et positionnel",`parties longues (${m.moves} coups) et ${m.winRate}% de victoires`);
   add(hi(m.lifetime,1500,12000)*0.8,"L'ADDICT","vit sur l'échiquier",`${m.lifetime.toLocaleString("fr-FR")} parties au compteur`);
   C.sort((a,b)=>b.norm-a.norm);
   return C[0];
@@ -485,6 +528,7 @@ function cardHTML(d){
       </div>
     </div>
     ${d.avatar?`<div class="c-photo"><img src="${d.avatar}" alt=""></div>`:`<div class="c-piece">${d.piece}</div>`}
+    <div class="c-emblem">${d.emblem||""}</div>
     <div class="c-name">${esc(d.name).slice(0,16)}</div>
     <div class="c-archetype">${d.arche.t} · ${d.arche.d}</div>
     <div class="c-flagship">${esc(d.flagship.txt)}</div>
@@ -500,6 +544,7 @@ function cardHTML(d){
 function applyCard(el,d){ el.className="card "+d.tier; el.innerHTML=cardHTML(d); }
 
 function render(d){
+  window.__last=d;
   document.body.className="theme-"+d.tier;
   applyCard($("card"),d);
   const cur=d.curStreak>=2?`${d.curStreak} ${d.curRes==="W"?"victoires":"défaites"} de suite`:"—";
@@ -511,12 +556,14 @@ function render(d){
       <div class="feats">${(d.feats.length?d.feats:[{t:d.flagship.txt}]).map(f=>`<div class="feat">${esc(f.t)}</div>`).join("")}</div>
     </div>
     <div class="bd-card"><h3>radar des notes</h3><div class="radar-wrap">${radar([{S:d.S,color:TIERCOL[d.tier]||"#46c2a8"}])}</div></div>
+    ${d.eloSeries&&d.eloSeries.length>=2?`<div class="bd-card"><h3>courbe d'elo (échantillon)</h3>${sparkline(d.eloSeries,TIERCOL[d.tier]||"#46c2a8")}</div>`:""}
     <div class="bd-card">
       <h3>le détail (vrai data)</h3>
       <p class="note" style="margin:-4px 0 12px">notes ancrées sur l'elo (base ${d.base}) + ajustées par tes vraies stats (perf, horloges, échecs…). récréatif, pas une analyse moteur.</p>
       <div class="kv">
         <div class="b"><div class="n gold">${d.lifetime.toLocaleString("fr-FR")}</div><div class="l">parties (total)</div></div>
         <div class="b"><div class="n">${d.modeLabel}</div><div class="l">mode préféré</div></div>
+        <div class="b"><div class="n">${d.signatureTC||"—"}</div><div class="l">cadence signature</div></div>
         <div class="b"><div class="n gold">${d.winRate}%</div><div class="l">win rate global</div></div>
         <div class="b"><div class="n ${d.perfPerGame>0?'good':d.perfPerGame<0?'bad':''}">${d.perfPerGame>0?'+':''}${d.perfPerGame}</div><div class="l">perf vs elo /100</div></div>
         <div class="b"><div class="n">${d.avgOppElo||"—"}</div><div class="l">elo moyen adversaires</div></div>
@@ -524,12 +571,14 @@ function render(d){
         <div class="b"><div class="n">${d.checksGiven}</div><div class="l">échecs donnés / partie</div></div>
         <div class="b"><div class="n">${d.zeitnotRate!==null?d.zeitnotRate+"%":"—"}</div><div class="l">coups en zeitnot</div></div>
         <div class="b"><div class="n good">${d.knownRate}%</div><div class="l">ouvertures connues</div></div>
-        <div class="b"><div class="n">${d.solidRate}%</div><div class="l">ouvertures solides</div></div>
         <div class="b"><div class="n">${d.postLossWR}%</div><div class="l">winrate après défaite</div></div>
         <div class="b"><div class="n ${d.worstStreak>=5?"bad":""}">${d.worstStreak}</div><div class="l">pire série déf. / jour</div></div>
       </div>
     </div>
-    <div class="bd-card"><h3>ouvertures les plus jouées</h3><div class="ol">${d.favOpenings.map(o=>`<div class="o"><span class="nm">${esc(o.nm)}</span><span class="wr" style="color:${o.wr>=55?"var(--acc2)":o.wr<45?"var(--bad)":"var(--muted)"}">${o.n}× · ${o.wr}%</span></div>`).join("")}</div></div>
+    <div class="bd-card"><h3>ouvertures les plus jouées</h3><div class="ol">${d.favOpenings.map(o=>`<div class="o"><span class="nm">${esc(o.nm)}</span><span class="wr" style="color:${o.wr>=55?"var(--acc2)":o.wr<45?"var(--bad)":"var(--muted)"}">${o.n}× · ${o.wr}%</span></div>`).join("")}</div>
+      ${d.bestOpening?`<p class="note" style="margin-top:10px">💪 ta meilleure : <b>${esc(d.bestOpening.nm)}</b> (${d.bestOpening.wr}% sur ${d.bestOpening.n})</p>`:""}
+      ${d.worstOpening?`<p class="note">💀 ta pire : <b style="color:var(--bad)">${esc(d.worstOpening.nm)}</b> (${d.worstOpening.wr}% sur ${d.worstOpening.n})</p>`:""}
+    </div>
     <div class="bd-card"><h3>tête à tête (parties classées)</h3><div class="ol">
         <div class="o"><span class="nm">némésis : <b>${d.nemesis?esc(d.nemesis.nm):"aucun"}</b></span><span class="wr">${d.nemesis?`${d.nemesis.l}D / ${d.nemesis.n}`:""}</span></div>
         <div class="o"><span class="nm">punching-ball : <b>${d.punchball?esc(d.punchball.nm):"aucun"}</b></span><span class="wr">${d.punchball?`${d.punchball.w}V / ${d.punchball.n}`:""}</span></div>
@@ -584,14 +633,35 @@ async function copyLink(){
   const url=location.origin+location.pathname+"?user="+encodeURIComponent(u);
   try{ await navigator.clipboard.writeText(url); setStatus("lien copié ✓ → "+url); }catch{ setStatus(url,false); }
 }
+async function exportBanner(){
+  const d=window.__last; if(!d){ setStatus("génère une carte d'abord",true); return; }
+  await document.fonts.ready;
+  const accent=TIERCOL[d.tier]||"#46c2a8";
+  const wrap=document.createElement("div");
+  wrap.style.cssText=`position:fixed;left:-10000px;top:0;width:1120px;height:620px;display:flex;align-items:center;gap:44px;padding:46px;box-sizing:border-box;background:radial-gradient(700px 500px at 82% 18%, ${accent}22, transparent 60%), #0a0d12;font-family:Chivo,system-ui,sans-serif;color:#e9edf2`;
+  const clone=$("card").cloneNode(true); clone.classList.add("exporting");
+  clone.style.cssText="position:relative;left:0;top:0;width:340px;height:560px;flex:none;margin:0;transform:none;box-shadow:none;border-radius:22px";
+  const right=document.createElement("div");
+  right.style.cssText="flex:1;display:flex;flex-direction:column;gap:12px;min-width:0";
+  right.innerHTML=`<div style="font-family:Anton;font-size:52px;line-height:.92;color:${accent}">${esc(d.arche.t)}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:15px;opacity:.8">« ${esc(d.arche.d)} »</div>
+    <div style="font-weight:900;font-size:18px;margin-top:2px">${esc(d.flagship.txt)}</div>
+    <div style="margin:6px 0">${radar([{S:d.S,color:accent}])}</div>
+    <div style="font-family:'JetBrains Mono',monospace;font-size:14px;opacity:.7">@${esc(d.user)} · ELO ${d.elo} · ${d.tierName} · ${SITE}</div>`;
+  wrap.appendChild(clone); wrap.appendChild(right); document.body.appendChild(wrap);
+  let canvas; try{ canvas=await html2canvas(wrap,{scale:2,backgroundColor:"#0a0d12",useCORS:true,width:1120,height:620,windowWidth:1300,windowHeight:800}); } finally{ wrap.remove(); }
+  const a=document.createElement("a"); a.download="chesscard-banniere-"+(d.user||"joueur")+".png"; a.href=canvas.toDataURL("image/png"); a.click();
+}
+const RANDOM_PLAYERS=["hikaru","magnuscarlsen","gothamchess","fabianocaruana","danielnaroditsky","anishgiri","gmwso","viditchess","nihalsarin","firouzja2003","penguingm1","alexandrabotez","chessbrah","gukeshdommaraju"];
+function randomPlayer(){ setMode("solo"); $("user").value=RANDOM_PLAYERS[Math.floor(Math.random()*RANDOM_PLAYERS.length)]; run(); }
 
 /* ---------- easter egg créateur ---------- */
 function creatorData(){
   return { user:"lusowall", name:"LUSOWALL", country:"🇧🇪", title:"DEV",
-    elo:3000, eloLabel:"créateur", peak:3000, base:99, OVR:99, tier:"legend", tierName:"CRÉATEUR",
+    elo:3000, eloLabel:"créateur", peak:3000, base:99, OVR:99, tier:"creator", tierName:"CRÉATEUR",
     S:{TAC:99,OUV:99,ATT:99,TMP:99,DEF:99,MTL:99},
     arche:{t:"LE CRÉATEUR",d:"mi-codeur mi-dieu",why:"a conçu chess.card de A à Z, à la main, pour le plaisir"},
-    piece:"👑", avatar:null,
+    piece:"👑", emblem:"👑", avatar:null, signatureTC:"∞", bestOpening:null, worstOpening:null, eloSeries:[], joinYear:2024,
     flagship:{txt:"a développé ce site — l'a fait gratuit"},
     feats:[{t:"a codé chess.card de zéro"},{t:"l'a rendu gratuit (grosse erreur business)"}],
     footRows:[["♥ MERCI","BEAUCOUP"],["AUX","UTILISATEURS"],["STATUT","FONDATEUR"],["PRIX","0€ (gratuit)"]],
@@ -614,7 +684,9 @@ function fakeData(){
   return { user:"test_"+tier.key, name:tier.name+" PLAYER", country:"🇧🇪",
     title:(["platine","monstre","legend"].includes(tier.key)?(tier.key==="legend"?"GM":tier.key==="monstre"?"IM":"FM"):""),
     elo, base, OVR:base, tier:tier.key, tierName:tier.name, S, arche:{t:ar[0],d:ar[1],why:ar[2]},
-    piece:tier.key==="troll"?"🤡":"♔", avatar:null,
+    piece:tier.key==="troll"?"🤡":"♔", emblem:emblemOf(tier.key), avatar:null,
+    signatureTC:["3+0","1+0","5+0","10+0","3+2"][rnd(0,4)], eloSeries:Array.from({length:30},(_,i)=>elo+Math.round(Math.sin(i/4)*40+rnd(-20,20))),
+    bestOpening:{nm:"Caro Kann Defense",n:rnd(8,20),wr:rnd(58,70)}, worstOpening:{nm:"Kings Gambit",n:rnd(5,12),wr:rnd(28,42)}, joinYear:rnd(2014,2024),
     flagship:{txt:`a battu un ${elo+rnd(120,300)} — battu par un ${elo-rnd(200,400)}`},
     feats:[{t:`${rnd(6,15)} victoires d'affilée`},{t:`battu par un ${elo-rnd(200,400)}`}],
     W:rnd(80,140),L:rnd(50,90),D:rnd(5,25),total:200,winRate:rnd(42,62),lifetime:rnd(500,40000),
@@ -637,8 +709,10 @@ function setMode(mode){
 $("go").addEventListener("click",run);
 $("user").addEventListener("keydown",e=>{if(e.key==="Enter")run();});
 $("png").addEventListener("click",()=>exportPNG(false));
+$("banner").addEventListener("click",exportBanner);
 $("copy").addEventListener("click",()=>exportPNG(true));
 $("link").addEventListener("click",copyLink);
+$("random").addEventListener("click",randomPlayer);
 $("goCompare").addEventListener("click",compareRun);
 $("userB").addEventListener("keydown",e=>{if(e.key==="Enter")compareRun();});
 $("modeSolo").addEventListener("click",()=>setMode("solo"));
