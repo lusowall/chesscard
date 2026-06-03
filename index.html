@@ -9,44 +9,45 @@
 <link href="https://fonts.googleapis.com/css2?family=Anton&family=Chivo:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
 <style>
-  :root{--bg:#0a0d12;--bg2:#11161f;--ink:#e9edf2;--muted:#8893a3;--line:#222a36;--acc:#e8c14e;--acc2:#46c2a8;--bad:#e2603f;--t1:#1a2230;--t2:#161b27}
+  :root{--bg:#0a0d12;--bg2:#11161f;--ink:#e9edf2;--muted:#8893a3;--line:#222a36;--acc:#e8c14e;--acc2:#46c2a8;--bad:#e2603f;--t1:#1a2230;--t2:#161b27;--t3:#11151e}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{background:radial-gradient(900px 600px at 15% -10%,var(--t1) 0%,transparent 55%),radial-gradient(800px 500px at 110% 10%,var(--t2) 0%,transparent 50%),var(--bg);color:var(--ink);font-family:"Chivo",system-ui,sans-serif;min-height:100%;padding:28px 18px 70px;-webkit-font-smoothing:antialiased;transition:background .6s ease}
+  body{background:radial-gradient(1000px 700px at 12% -8%,var(--t1) 0%,transparent 52%),radial-gradient(900px 600px at 112% 8%,var(--t2) 0%,transparent 48%),radial-gradient(800px 600px at 50% 118%,var(--t3) 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Chivo",system-ui,sans-serif;min-height:100%;padding:28px 18px 70px;-webkit-font-smoothing:antialiased;transition:background .6s ease}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)'/%3E%3C/svg%3E")}
   .wrap{max-width:1040px;margin:0 auto;position:relative;z-index:1}
-  body.theme-troll{--t1:#3a0a2a;--t2:#3a0a12;--acc2:#ff3aa5}
-  body.theme-bronze{--t1:#2e1d0e;--t2:#241407;--acc2:#c98a4b}
-  body.theme-argent{--t1:#1e2630;--t2:#171d24;--acc2:#b9c7d6}
-  body.theme-or{--t1:#2a2410;--t2:#1f1a08;--acc2:#e8c14e}
-  body.theme-emeraude{--t1:#0c2e22;--t2:#06251a;--acc2:#33d9a0}
-  body.theme-platine{--t1:#1c2730;--t2:#162028;--acc2:#5fb0e6}
-  body.theme-monstre{--t1:#2e0810;--t2:#1a0410;--acc2:#ff5a6e}
-  body.theme-legend{--t1:#1a2244;--t2:#101a2e;--acc2:#f0d98a}
+  body.theme-troll{--t1:#5a1042;--t2:#5a1018;--t3:#3a0820;--acc2:#ff3aa5}
+  body.theme-bronze{--t1:#4a2f15;--t2:#3a200b;--t3:#2a1607;--acc2:#d49457}
+  body.theme-argent{--t1:#2a3340;--t2:#222a33;--t3:#1a2028;--acc2:#c2d0dd}
+  body.theme-or{--t1:#473b14;--t2:#352b0c;--t3:#241d06;--acc2:#f0c94e}
+  body.theme-emeraude{--t1:#0f4733;--t2:#0a3826;--t3:#062619;--acc2:#33d9a0}
+  body.theme-platine{--t1:#1f3a52;--t2:#163048;--t3:#0e2233;--acc2:#5fb0e6}
+  body.theme-monstre{--t1:#4a0d18;--t2:#2e0810;--t3:#1a040a;--acc2:#ff5a6e}
+  body.theme-legend{--t1:#23316b;--t2:#161f44;--t3:#0c1430;--acc2:#f0d98a}
 
   header.hd{display:flex;align-items:baseline;gap:14px;flex-wrap:wrap;margin-bottom:6px}
   .logo{font-family:"Anton";font-size:clamp(34px,6vw,58px);letter-spacing:1px;line-height:.9}
   .logo b{color:var(--acc)} .logo .dot{color:var(--acc2)}
   .tag{font-family:"JetBrains Mono";font-size:12px;color:var(--muted)}
-  .sub{color:var(--muted);max-width:640px;margin:10px 0 18px;font-size:14.5px;line-height:1.55}
+  .sub{color:var(--muted);max-width:660px;margin:10px 0 18px;font-size:14.5px;line-height:1.55}
   .sub code{font-family:"JetBrains Mono";color:var(--acc2);font-size:12.5px}
+  .sub .warn{color:#c7ad6a}
 
   .toggle{display:inline-flex;background:#0c1016;border:1px solid var(--line);border-radius:11px;padding:4px;margin-bottom:14px;gap:4px}
-  .toggle button{font-family:"JetBrains Mono";font-weight:700;font-size:13px;background:transparent;border:none;color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer}
+  .toggle button{font-family:"JetBrains Mono";font-weight:700;font-size:13px;background:transparent;border:none;color:var(--muted);padding:8px 16px;border-radius:8px;cursor:pointer;transition:.15s}
   .toggle button.on{background:var(--acc2);color:#06120f}
 
-  .panel{background:linear-gradient(180deg,var(--bg2),#0c1016);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.4)}
+  .panel{background:linear-gradient(180deg,var(--bg2),#0c1016);border:1px solid var(--line);border-radius:16px;padding:18px;box-shadow:0 20px 50px rgba(0,0,0,.4);border-top:2px solid var(--acc2)}
   .panel.hidden{display:none}
   .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end}
   .field{display:flex;flex-direction:column;gap:6px}
-  .field.grow{flex:1;min-width:180px}
+  .field.grow{flex:1;min-width:160px}
   label{font-family:"JetBrains Mono";font-size:11px;text-transform:uppercase;letter-spacing:1px;color:var(--muted)}
   input,select{background:#070a0f;border:1px solid var(--line);color:var(--ink);padding:13px 14px;border-radius:10px;font-family:"JetBrains Mono";font-size:14px;outline:none}
   input:focus,select:focus{border-color:var(--acc2)}
   button.go{font-family:"Anton";letter-spacing:1px;font-size:18px;background:linear-gradient(180deg,#f2d166,#d8a52f);color:#1a1205;border:none;padding:13px 26px;border-radius:11px;cursor:pointer;text-transform:uppercase;box-shadow:0 8px 22px rgba(216,165,47,.3);transition:transform .12s,filter .12s}
   button.go:hover{transform:translateY(-1px);filter:brightness(1.05)}
   button.go:disabled{filter:grayscale(.7) brightness(.7);cursor:wait;transform:none}
-  .status{margin-top:14px;font-family:"JetBrains Mono";font-size:12.5px;color:var(--muted);min-height:18px}
+  .status{margin-top:14px;font-family:"JetBrains Mono";font-size:12.5px;color:var(--muted);min-height:18px;word-break:break-all}
   .status.err{color:var(--bad)}
   .bar{height:4px;background:#0a0e13;border-radius:99px;overflow:hidden;margin-top:10px;display:none}
   .bar.on{display:block}
@@ -62,24 +63,22 @@
 
   .card-stage{display:flex;flex-direction:column;align-items:center;gap:16px}
   .card{width:340px;height:560px;border-radius:22px;position:relative;overflow:hidden;font-family:"Chivo";padding:20px 22px 14px;color:#1c1606;display:flex;flex-direction:column;box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.18)}
+  .card.exporting{box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)!important;transform:none!important;margin:0!important}
   .card *{position:relative;z-index:2}
   .card.troll{background:linear-gradient(160deg,#ff3aa5,#ff6a3d 55%,#ffd23a);color:#2a0018}
   .card.troll::before{content:"";position:absolute;inset:0;z-index:1;background:repeating-linear-gradient(45deg,rgba(0,255,150,.20) 0 12px,transparent 12px 24px)}
-  .card.bronze{background:linear-gradient(160deg,#c08a4e 0%,#7e4f24 50%,#5c3717 100%);color:#2a1808}
+  .card.bronze{background:linear-gradient(160deg,#cd874a 0%,#8a5226 48%,#5a3414 100%);color:#2a1606}
   .card.argent{background:linear-gradient(160deg,#eef2f6 0%,#aab6c2 48%,#7d8a98 100%);color:#1c2228}
-  .card.or{background:linear-gradient(160deg,#f7e08a 0%,#e3bd4c 48%,#bb8e22 100%);color:#241a05}
+  .card.or{background:linear-gradient(160deg,#fff0a0 0%,#f4cf52 42%,#d2a32e 100%);color:#3a2a05}
   .card.emeraude{background:linear-gradient(160deg,#1fae6b 0%,#0f7a48 50%,#063b25 100%);color:#eafff4;box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.25),0 0 28px rgba(31,174,107,.35)}
   .card.platine{background:linear-gradient(160deg,#eaf7ff 0%,#9ed2f7 32%,#4f9ee6 64%,#2766b4 100%);color:#0e2238;box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 2px rgba(255,255,255,.75),0 0 32px rgba(60,150,235,.55)}
   .card.platine::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.55) 44%,transparent 52%);opacity:.7}
   .card.monstre{background:linear-gradient(160deg,#4a0f17 0%,#23070f 52%,#07030a 100%);color:#ffd9d0;box-shadow:0 30px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,90,110,.35),0 0 34px rgba(220,30,50,.4)}
   .card.legend{background:linear-gradient(160deg,#2b3b6e 0%,#101a3c 48%,#05060f 100%);color:#f4efda;box-shadow:0 30px 60px rgba(0,0,0,.6),inset 0 0 0 2px rgba(212,175,55,.6),0 0 40px rgba(120,150,230,.45)}
   .card.legend::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(1.5px 1.5px at 20% 25%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 70% 18%,#ffe9a8 50%,transparent),radial-gradient(1px 1px at 45% 40%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 82% 55%,#cfe0ff 50%,transparent),radial-gradient(1px 1px at 30% 62%,#fff 50%,transparent);opacity:.8}
-  .card.emeraude .c-archetype{color:#bff7da}
-  .card.monstre .c-archetype{color:#ff8a98}
-  .card.platine .c-archetype{color:#0c3a63}
-  .card.legend .c-archetype{color:#f0d98a}
-  .card.troll .c-archetype{color:#0a3d22}
+  .card.emeraude .c-archetype{color:#bff7da}.card.monstre .c-archetype{color:#ff8a98}.card.platine .c-archetype{color:#0c3a63}.card.legend .c-archetype{color:#f0d98a}.card.troll .c-archetype{color:#0a3d22}
   .card::after{content:"";position:absolute;inset:0;z-index:3;pointer-events:none;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.26) 48%,transparent 58%);mix-blend-mode:screen;opacity:.5}
+  .card.exporting::after{opacity:.35}
 
   .c-top{display:flex;justify-content:space-between;align-items:flex-start}
   .c-ovr{font-family:"Anton";font-size:60px;line-height:.8}
@@ -88,8 +87,8 @@
   .c-flag{font-size:26px;text-align:right;margin-top:6px}
   .c-title{text-align:right;font-family:"Anton";font-size:18px;letter-spacing:1px;margin-top:2px;color:#b8860b}
   .card.emeraude .c-title,.card.monstre .c-title,.card.legend .c-title{color:#ffd86b;text-shadow:0 1px 4px rgba(0,0,0,.4)}
-  .c-piece{position:absolute;left:50%;top:96px;transform:translateX(-50%);font-size:118px;line-height:1;z-index:1;opacity:.92;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35))}
-  .c-photo{position:absolute;left:50%;top:84px;transform:translateX(-50%);width:130px;height:130px;border-radius:50%;overflow:hidden;z-index:1;box-shadow:0 8px 20px rgba(0,0,0,.4),inset 0 0 0 3px rgba(255,255,255,.55);background:rgba(0,0,0,.15)}
+  .c-piece{position:absolute;left:0;right:0;top:96px;text-align:center;font-size:118px;line-height:1;z-index:1;opacity:.92;filter:drop-shadow(0 10px 14px rgba(0,0,0,.35))}
+  .c-photo{position:absolute;left:0;right:0;top:84px;margin:0 auto;width:130px;height:130px;border-radius:50%;overflow:hidden;z-index:1;box-shadow:0 8px 20px rgba(0,0,0,.4),inset 0 0 0 3px rgba(255,255,255,.55);background:rgba(0,0,0,.15)}
   .c-photo img{width:100%;height:100%;object-fit:cover;display:block}
   .c-name{margin-top:150px;text-align:center;font-family:"Anton";font-size:28px;letter-spacing:.5px;text-transform:uppercase;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
   .c-archetype{text-align:center;font-family:"JetBrains Mono";font-weight:700;font-size:12px;letter-spacing:.6px;margin-top:-2px;opacity:.95}
@@ -103,7 +102,7 @@
   .c-foot div{display:flex;justify-content:space-between;gap:8px}
   .c-foot .lab{opacity:.6;letter-spacing:1px;flex:none}
   .c-foot .val{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-  .c-watermark{margin-top:auto;padding-top:8px;text-align:center;font-family:"JetBrains Mono";font-size:9px;letter-spacing:1px;opacity:.55}
+  .c-watermark{margin-top:auto;padding-top:8px;text-align:center;font-family:"JetBrains Mono";font-size:9px;letter-spacing:.8px;opacity:.6;line-height:1.5}
 
   .dl{display:flex;gap:8px;flex-wrap:wrap;justify-content:center}
   .dl button{font-family:"JetBrains Mono";font-weight:700;font-size:12px;background:#0c1016;border:1px solid var(--line);color:var(--ink);padding:11px 14px;border-radius:10px;cursor:pointer}
@@ -111,12 +110,12 @@
 
   .breakdown{display:flex;flex-direction:column;gap:14px;width:100%}
   .bd-card{background:linear-gradient(180deg,var(--bg2),#0c1016);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
-  .bd-card h3{font-family:"JetBrains Mono";font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--muted);margin-bottom:12px;font-weight:700}
+  .bd-card h3{font-family:"JetBrains Mono";font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--acc2);margin-bottom:12px;font-weight:700}
   .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
   .kv .b{background:#070a0f;border:1px solid var(--line);border-radius:10px;padding:11px 13px}
-  .kv .b .n{font-family:"Anton";font-size:26px;line-height:1}
+  .kv .b .n{font-family:"Anton";font-size:24px;line-height:1}
   .kv .b .l{font-family:"JetBrains Mono";font-size:10px;color:var(--muted);margin-top:4px;text-transform:uppercase}
-  .kv .b .n.good{color:var(--acc2)} .kv .b .n.bad{color:var(--bad)} .kv .b .n.gold{color:var(--acc)}
+  .kv .b .n.good{color:var(--acc2)}.kv .b .n.bad{color:var(--bad)}.kv .b .n.gold{color:var(--acc)}
   .ol{display:flex;flex-direction:column;gap:7px}
   .ol .o{display:flex;justify-content:space-between;gap:10px;font-size:13px}
   .ol .o .nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
@@ -133,31 +132,24 @@
   a{color:var(--acc2)}
   .foot-link{margin-top:34px;text-align:center;font-family:"JetBrains Mono";font-size:11px;color:var(--muted)}
 
-  /* compare */
   .cmp-cards{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
-  .cmp-cards .card-stage{gap:10px}
   .cmp-table{max-width:560px;margin:0 auto}
   .cmp-row{display:grid;grid-template-columns:1fr 110px 1fr;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);font-family:"JetBrains Mono";font-size:14px}
   .cmp-row .lab{text-align:center;color:var(--muted);font-size:11px;letter-spacing:1px}
   .cmp-row .p{font-family:"Anton";font-size:22px}
-  .cmp-row .p.l{text-align:right} .cmp-row .p.r{text-align:left}
-  .cmp-row .win{color:var(--acc2)} .cmp-row .lose{opacity:.55}
+  .cmp-row .p.l{text-align:right}.cmp-row .p.r{text-align:left}
+  .cmp-row .win{color:var(--acc2)}.cmp-row .lose{opacity:.55}
   .cmp-names{display:grid;grid-template-columns:1fr 110px 1fr;gap:8px;padding:6px 12px;font-family:"Anton";font-size:18px}
-  .cmp-names .l{text-align:right} .cmp-names .r{text-align:left}
+  .cmp-names .l{text-align:right}.cmp-names .r{text-align:left}
 
-  @media(max-width:680px){
-    body{padding:18px 10px 70px}
-    .row{flex-direction:column;align-items:stretch}
-    .field.grow,.field{width:100%}
-    button.go{width:100%}
-  }
-  @media(max-width:372px){.card{transform:scale(.92);transform-origin:top center;margin-bottom:-44px}}
+  @media(max-width:680px){body{padding:18px 10px 70px}.row{flex-direction:column;align-items:stretch}.field.grow,.field{width:100%}button.go{width:100%}}
+  @media(max-width:372px){.card:not(.exporting){transform:scale(.92);transform-origin:top center;margin-bottom:-44px}}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header class="hd"><div class="logo"><b>chess</b><span class="dot">.</span>card</div><span class="tag">// data chess.com</span></header>
-  <p class="sub">tape ton pseudo <b>chess.com</b>, on te fond une carte collector qui change de couleur selon ton elo. partage-la en <code>PNG</code> ou via un <code>lien direct</code>.</p>
+  <p class="sub">tape ton pseudo <b>chess.com</b>, on te fond une carte collector qui change de couleur selon ton elo. partage-la en <code>PNG</code> ou via un <code>lien direct</code>.<br><span class="warn">⚠ outil 100% récréatif : les notes sont des approximations pour le fun et le flex, pas une analyse sérieuse de ton niveau.</span></p>
 
   <div class="toggle">
     <button id="modeSolo" class="on">carte solo</button>
@@ -167,7 +159,10 @@
   <div class="panel" id="soloPanel">
     <div class="row">
       <div class="field grow"><label for="user">pseudo chess.com</label><input id="user" placeholder="ex : hikaru" autocomplete="off" spellcheck="false"></div>
-      <div class="field"><label for="depth">parties analysées</label>
+      <div class="field"><label for="tc">cadence</label>
+        <select id="tc"><option value="all" selected>toutes</option><option value="rapid">rapide</option><option value="blitz">blitz</option><option value="bullet">bullet</option></select>
+      </div>
+      <div class="field"><label for="depth">parties</label>
         <select id="depth"><option value="500">500 (très rapide)</option><option value="1000" selected>1000 (rapide)</option><option value="2500">2500 (moyen)</option><option value="5000">5000 (lent)</option><option value="all">tout (variable)</option></select>
       </div>
       <button class="go" id="go">générer</button>
@@ -181,7 +176,7 @@
       <div class="field grow"><label for="userA">joueur 1</label><input id="userA" placeholder="ex : hikaru" autocomplete="off" spellcheck="false"></div>
       <div class="field grow"><label for="userB">joueur 2</label><input id="userB" placeholder="ex : magnuscarlsen" autocomplete="off" spellcheck="false"></div>
       <div class="field"><label for="depthC">parties / joueur</label>
-        <select id="depthC"><option value="500" selected>500 (rapide)</option><option value="1000">1000 (moyen)</option><option value="2500">2500 (lent)</option></select>
+        <select id="depthC"><option value="500">500</option><option value="1000" selected>1000</option><option value="2500">2500</option><option value="5000">5000</option><option value="all">tout</option></select>
       </div>
       <button class="go" id="goCompare">comparer</button>
     </div>
@@ -227,28 +222,26 @@ const TIERS=[
 ];
 function tierOf(elo){ return TIERS.find(t=>elo>=t.min&&elo<=t.max)||TIERS[0]; }
 function eloBase(elo){ return clamp(Math.round(32+elo*0.0223),28,99); }
-const TIERCOL={troll:"#ff3aa5",bronze:"#c98a4b",argent:"#aab6c2",or:"#e3bd4c",emeraude:"#1fae6b",platine:"#4f9ee6",monstre:"#ff5a6e",legend:"#f0d98a"};
+const TIERCOL={troll:"#ff3aa5",bronze:"#cd874a",argent:"#aab6c2",or:"#f4cf52",emeraude:"#1fae6b",platine:"#4f9ee6",monstre:"#ff5a6e",legend:"#f0d98a"};
 
 function setStatus(t,err,id){ const s=$(id||"status"); s.textContent=t; s.className="status"+(err?" err":""); }
 function setBar(p,id){ const b=$(id||"bar"); b.classList.add("on"); b.querySelector("i").style.width=clamp(p,0,100)+"%"; }
 function hideBar(id){ $(id||"bar").classList.remove("on"); }
-
 async function getJSON(url){ const r=await fetch(url,{headers:{"Accept":"application/json"}}); if(r.status===404)throw new Error("404"); if(!r.ok)throw new Error("HTTP "+r.status); return r.json(); }
 
 /* PGN helpers */
 function tag(pgn,name){ const m=pgn&&pgn.match(new RegExp('\\['+name+'\\s+"([^"]*)"\\]')); return m?m[1]:""; }
 function openingFromGame(g){ const url=tag(g.pgn,"ECOUrl")||g.eco||""; let slug=url.split("/openings/")[1]||""; if(!slug)return tag(g.pgn,"ECO")||"Inconnue"; slug=slug.split(/[?#]/)[0]; let name=slug.replace(/-/g," ").replace(/\d.*$/,"").trim(); name=name.split(" ").slice(0,4).join(" "); return name||"Inconnue"; }
 function sanMoves(pgn){ if(!pgn)return[]; let mt=pgn.replace(/\[[^\]]*\]/g,""); mt=mt.replace(/\{[^}]*\}/g," ").replace(/\$\d+/g," ").replace(/\d+\.(\.\.)?/g," ").replace(/(1-0|0-1|1\/2-1\/2|\*)/g," "); return mt.trim().split(/\s+/).filter(Boolean); }
-function hasFianchetto(pgn,iAmWhite){ const mv=sanMoves(pgn).slice(0,24); const mine=mv.filter((_,i)=>(i%2===0)===iAmWhite); let p=false,b=false; for(const m of mine){ if(m==="g3"||m==="b3"||m==="g6"||m==="b6")p=true; if(/^B(g2|b2|g7|b7)/.test(m))b=true; } return p&&b; }
-function avgMoves(games){ let s=0,c=0; for(const g of games){ const m=sanMoves(g.pgn).length; if(m){s+=m;c++;} } return c?Math.round(s/c/2):40; }
-function gameMoves(g){ return Math.round(sanMoves(g.pgn).length/2); }
+function clockSeconds(str){ const p=str.split(":").map(Number); let s=0; for(const x of p)s=s*60+x; return s; }
+function parseClocks(pgn){ const out=[]; const re=/\[%clk\s+([0-9:.]+)\]/g; let m; while((m=re.exec(pgn)))out.push(clockSeconds(m[1])); return out; }
+function baseTimeOf(tc){ if(!tc||tc.indexOf("/")>=0)return null; const b=parseInt(tc.split("+")[0],10); return isNaN(b)?null:b; }
 function flag(code){ if(!code)return "🏳️"; const cc=code.split("/").pop(); if(!/^[A-Z]{2}$/.test(cc))return "🏳️"; return String.fromCodePoint(...[...cc].map(c=>0x1F1E6+c.charCodeAt(0)-65)); }
 function loadAvatar(url){ return new Promise(res=>{ if(!url){res(null);return;} const img=new Image(); img.crossOrigin="anonymous"; const to=setTimeout(()=>res(null),6000); img.onload=()=>{clearTimeout(to);try{const cv=document.createElement("canvas");cv.width=img.naturalWidth;cv.height=img.naturalHeight;cv.getContext("2d").drawImage(img,0,0);res(cv.toDataURL("image/png"));}catch(_){res(null);}}; img.onerror=()=>{clearTimeout(to);res(null);}; img.src=url; }); }
 
-/* ---------- récupération + analyse ---------- */
-async function buildData(user,target,sId,bId){
-  let profile,stats;
-  [profile,stats]=await Promise.all([getJSON(API+user),getJSON(API+user+"/stats")]);
+/* ---------- récupération ---------- */
+async function buildData(user,target,sId,bId,tcFilter){
+  const [profile,stats]=await Promise.all([getJSON(API+user),getJSON(API+user+"/stats")]);
   setStatus("récupération des archives…",false,sId); setBar(10,bId);
   const arch=await getJSON(API+user+"/games/archives");
   const months=arch.archives.slice().reverse();
@@ -256,11 +249,11 @@ async function buildData(user,target,sId,bId){
   for(let i=0;i<months.length && games.length<target;i++){
     setStatus(`chargement… (${games.length})`,false,sId);
     setBar(10+Math.min(70,(games.length/(target===Infinity?2000:target))*70),bId);
-    try{ const md=await getJSON(months[i]); games=games.concat(md.games||[]); }catch(_){}
+    try{ const md=await getJSON(months[i]); let gs=md.games||[]; if(tcFilter&&tcFilter!=="all")gs=gs.filter(x=>x.time_class===tcFilter); games=games.concat(gs); }catch(_){}
   }
   if(target!==Infinity) games=games.slice(0,target);
   if(games.length===0) throw new Error("nogames");
-  const data=analyse(user,games,profile,stats);
+  const data=analyse(user,games,profile,stats,tcFilter);
   data.avatar=await loadAvatar(profile.avatar);
   return data;
 }
@@ -268,17 +261,18 @@ async function buildData(user,target,sId,bId){
 async function run(){
   const user=$("user").value.trim().toLowerCase();
   if(!user){ setStatus("euh il manque le pseudo",true); return; }
-  const dv=$("depth").value, target=dv==="all"?Infinity:parseInt(dv,10);
+  if(user==="lusowall" && !window.__lw){ window.__lw=true; render(creatorData()); $("result").classList.add("on"); setStatus("✨ carte créateur — re-cherche lusowall pour les vraies stats"); $("result").scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  const tc=$("tc").value, dv=$("depth").value, target=dv==="all"?Infinity:parseInt(dv,10);
   $("go").disabled=true; $("result").classList.remove("on");
   setStatus("récupération du profil…"); setBar(4);
   try{
-    const data=await buildData(user,target,"status","bar");
+    const data=await buildData(user,target,"status","bar",tc);
     render(data);
     setStatus(`carte générée sur ${data.total} parties`); setBar(100); setTimeout(()=>hideBar(),700);
     $("result").classList.add("on"); $("result").scrollIntoView({behavior:"smooth",block:"start"});
   }catch(e){
     if(e.message==="404") setStatus("ce pseudo existe pas sur chess.com 🤔",true);
-    else if(e.message==="nogames") setStatus("aucune partie trouvée pour ce joueur",true);
+    else if(e.message==="nogames") setStatus("aucune partie trouvée pour ce joueur (ou cette cadence)",true);
     else { console.error(e); setStatus("oups, erreur réseau ou API. réessaie.",true); }
     hideBar();
   }finally{ $("go").disabled=false; }
@@ -287,14 +281,12 @@ async function run(){
 async function compareRun(){
   const a=$("userA").value.trim().toLowerCase(), b=$("userB").value.trim().toLowerCase();
   if(!a||!b){ setStatus("il faut deux pseudos",true,"statusC"); return; }
-  const target=parseInt($("depthC").value,10);
+  const dv=$("depthC").value, target=dv==="all"?Infinity:parseInt(dv,10);
   $("goCompare").disabled=true; $("compareResult").innerHTML="";
   setStatus("analyse des deux joueurs…",false,"statusC"); setBar(4,"barC");
   try{
-    const dA=await buildData(a,target,"statusC","barC");
-    setBar(55,"barC");
-    const dB=await buildData(b,target,"statusC","barC");
-    setBar(100,"barC"); setTimeout(()=>hideBar("barC"),700);
+    const dA=await buildData(a,target,"statusC","barC","all"); setBar(55,"barC");
+    const dB=await buildData(b,target,"statusC","barC","all"); setBar(100,"barC"); setTimeout(()=>hideBar("barC"),700);
     renderCompare(dA,dB);
     setStatus("comparaison prête",false,"statusC");
     $("compareResult").scrollIntoView({behavior:"smooth",block:"start"});
@@ -306,11 +298,21 @@ async function compareRun(){
   }finally{ $("goCompare").disabled=false; }
 }
 
-function analyse(user,games,profile,stats){
+function pickEloInfo(stats,tcFilter){
+  const cats=[["chess_rapid","rapide"],["chess_blitz","blitz"],["chess_bullet","bullet"],["chess_daily","corresp."]];
+  if(tcFilter&&tcFilter!=="all"){ const ck="chess_"+tcFilter; const r=stats?.[ck]?.last?.rating; if(r)return {elo:r,label:tcFilter,cat:ck}; }
+  let best=null;
+  for(const [ck,lb] of cats){ const r=stats?.[ck]?.last?.rating; if(r&&(!best||r>best.elo))best={elo:r,label:lb,cat:ck}; }
+  return best||{elo:1000,label:"—",cat:"chess_rapid"};
+}
+
+function analyse(user,games,profile,stats,tcFilter){
   let W=0,L=0,D=0, whiteW=0,whiteN=0,blackW=0,blackN=0;
-  let timeWins=0,timeLosses=0,mateWins=0,resignWins=0,totalWins=0;
-  let fianchetto=0,topBeat=0, winLong=0,lossLong=0, variantGames=0, nightGames=0;
-  let oppEloSum=0,oppEloN=0, fastMate=999, worstLossElo=9999;
+  let timeWins=0,timeLosses=0,mateWins=0,resignWins=0,totalWins=0, fianchetto=0,topBeat=0,variantGames=0,nightGames=0;
+  let oppEloSum=0,oppEloN=0, fastMate=999, worstLossElo=9999, upsetWins=0;
+  let myChecks=0,oppChecks=0, movesSum=0, lossMovesSum=0,lossN=0, fastMateLoss=0;
+  let zeitnotMoves=0,clockMoves=0, finalRatioSum=0,finalRatioN=0;
+  let perfSum=0,perfN=0;
   const openings={}, opp={}, byDay={}, chrono=[];
   const drawRes=new Set(["agreed","repetition","stalemate","insufficient","timevsinsufficient","50move"]);
 
@@ -318,20 +320,35 @@ function analyse(user,games,profile,stats){
     const iAmWhite=g.white.username.toLowerCase()===user;
     const me=iAmWhite?g.white:g.black, you=iAmWhite?g.black:g.white;
     let res; if(me.result==="win")res="W"; else if(drawRes.has(me.result))res="D"; else res="L";
-    const mv=gameMoves(g);
+    const moves=sanMoves(g.pgn), mv=Math.round(moves.length/2); movesSum+=mv;
+
     if(res==="W")W++; else if(res==="L")L++; else D++;
     if(iAmWhite){whiteN++; if(res==="W")whiteW++;} else {blackN++; if(res==="W")blackW++;}
     if(res==="W"){ totalWins++;
       if(you.result==="timeout")timeWins++;
       if(you.result==="checkmated"){mateWins++; if(mv<fastMate)fastMate=mv;}
       if(you.result==="resigned")resignWins++;
-      if(mv>=40)winLong++;
       if(g.rated&&you.rating&&you.rating>topBeat)topBeat=you.rating;
+      if(g.rated&&me.rating&&you.rating&&you.rating>=me.rating+50)upsetWins++;
     }
-    if(res==="L"){ if(me.result==="timeout")timeLosses++; if(mv>=40)lossLong++; if(g.rated&&you.rating&&you.rating<worstLossElo)worstLossElo=you.rating; }
+    if(res==="L"){ if(me.result==="timeout")timeLosses++; lossMovesSum+=mv; lossN++; if(me.result==="checkmated"&&mv<=25)fastMateLoss++; if(g.rated&&you.rating&&you.rating<worstLossElo)worstLossElo=you.rating; }
     if(g.rated&&you.rating){ oppEloSum+=you.rating; oppEloN++; }
+    if(g.rated&&me.rating&&you.rating){ const E=1/(1+Math.pow(10,(you.rating-me.rating)/400)); const A=res==="W"?1:res==="D"?0.5:0; perfSum+=(A-E); perfN++; }
+
+    // checks (+/#) données vs reçues + fianchetto
+    let p=false,bb=false;
+    moves.forEach((s,idx)=>{ const mine=(idx%2===0)===iAmWhite; const chk=/[+#]/.test(s);
+      if(mine){ if(chk)myChecks++; if(idx<24){ if(s==="g3"||s==="b3"||s==="g6"||s==="b6")p=true; if(/^B(g2|b2|g7|b7)/.test(s))bb=true; } }
+      else if(chk)oppChecks++;
+    });
+    if(p&&bb)fianchetto++;
+
+    // horloges
+    const bt=baseTimeOf(g.time_control);
+    if(bt){ const cl=parseClocks(g.pgn).filter((_,i)=>(i%2===0)===iAmWhite);
+      if(cl.length){ const thr=bt<=60?5:15; cl.forEach(c=>{clockMoves++; if(c<thr)zeitnotMoves++;}); finalRatioSum+=clamp(cl[cl.length-1]/bt,0,1); finalRatioN++; } }
+
     const op=openingFromGame(g); openings[op]=openings[op]||{n:0,w:0}; openings[op].n++; if(res==="W")openings[op].w++;
-    if(hasFianchetto(g.pgn,iAmWhite))fianchetto++;
     if(g.rules&&g.rules!=="chess")variantGames++;
     if(g.rated){ const on=you.username; opp[on]=opp[on]||{n:0,w:0,l:0}; opp[on].n++; if(res==="W")opp[on].w++; else if(res==="L")opp[on].l++; }
     const t=(g.end_time||0)*1000, dt=new Date(t), day=dt.toISOString().slice(0,10), h=dt.getHours();
@@ -340,22 +357,22 @@ function analyse(user,games,profile,stats){
   }
 
   const total=W+L+D, winRate=pct(W,total), lossRate=pct(L,total), drawRate=pct(D,total);
-
   const sorted=chrono.slice().sort((a,b)=>a.t-b.t);
   let bestWinStreak=0,worstLossStreak=0,cw=0,cl=0;
   sorted.forEach(x=>{ if(!x.rated)return; if(x.res==="W"){cw++;bestWinStreak=Math.max(bestWinStreak,cw);}else cw=0; if(x.res==="L"){cl++;worstLossStreak=Math.max(worstLossStreak,cl);}else cl=0; });
-  // série en cours (sur les plus récentes)
   let curStreak=0,curRes=null;
   for(let i=sorted.length-1;i>=0;i--){ const r=sorted[i].res; if(r==="D")break; if(curRes===null)curRes=r; if(r===curRes)curStreak++; else break; }
   let worstStreak=0,longestDayStreak=0;
-  for(const day in byDay){ const arr=byDay[day].sort((a,b)=>a.t-b.t); let cL=0,cAny=0,prev=null; for(const x of arr){ if(x.res==="L"){cL++;worstStreak=Math.max(worstStreak,cL);}else cL=0; if(x.res===prev)cAny++; else {cAny=1;prev=x.res;} longestDayStreak=Math.max(longestDayStreak,cAny); } }
+  for(const day in byDay){ const arr=byDay[day].sort((a,b)=>a.t-b.t); let cL=0,cAny=0,prev=null; for(const x of arr){ if(x.res==="L"){cL++;worstStreak=Math.max(worstStreak,cL);}else cL=0; if(x.res===prev)cAny++; else{cAny=1;prev=x.res;} longestDayStreak=Math.max(longestDayStreak,cAny);} }
+  // tilt : winrate sur la partie suivant une défaite
+  let plW=0,plG=0,prevR=null;
+  sorted.forEach(x=>{ if(prevR==="L"&&x.rated){plG++; if(x.res==="W")plW++;} prevR=x.rated?x.res:prevR; });
+  const postLossWR=plG?pct(plW,plG):winRate, tiltDrop=winRate-postLossWR;
 
   const opList=Object.entries(openings).map(([nm,v])=>({nm,n:v.n,wr:pct(v.w,v.n)}));
   const favOpenings=opList.slice().sort((a,b)=>b.n-a.n).slice(0,5);
   const repertoire=opList.filter(o=>o.n>=2).length;
-  const favWR=favOpenings[0]?favOpenings[0].wr:50;
-  const dominance=pct(favOpenings[0]?favOpenings[0].n:0,total);
-
+  const favWR=favOpenings[0]?favOpenings[0].wr:50, dominance=pct(favOpenings[0]?favOpenings[0].n:0,total);
   let gambitGames=0,knownGames=0,solidGames=0;
   const solidRe=/caro|fran|slav|petro|berlin|scandinav|stonewall|hippo|london|gambit declined|qgd|semi.?slav|philidor|exchange/i;
   for(const o of opList){ if(/gambit/i.test(o.nm))gambitGames+=o.n; if(o.nm!=="Inconnue")knownGames+=o.n; if(solidRe.test(o.nm))solidGames+=o.n; }
@@ -368,35 +385,34 @@ function analyse(user,games,profile,stats){
   const tcCount={}; for(const g of games){const k=g.time_class||"?";tcCount[k]=(tcCount[k]||0)+1;}
   const modeKey=Object.entries(tcCount).sort((a,b)=>b[1]-a[1])[0]?.[0]||"?";
   const modeLabel={bullet:"BULLET",blitz:"BLITZ",rapid:"RAPIDE",daily:"CORRESP."}[modeKey]||"—";
-  const bulletShare=pct(tcCount.bullet||0,total), rapidShare=pct(tcCount.rapid||0,total);
-  const moves=avgMoves(games);
+  const moves=total?Math.round(movesSum/total):40;
 
-  const horloger=pct(timeWins,Math.max(1,totalWins));
-  const mateRate=pct(mateWins,Math.max(1,totalWins));
+  const horloger=pct(timeWins,Math.max(1,totalWins)), mateRate=pct(mateWins,Math.max(1,totalWins));
   const decisiveWinRate=pct(mateWins+resignWins,Math.max(1,totalWins));
-  const longWinRate=pct(winLong,Math.max(1,W)), longLossRate=pct(lossLong,Math.max(1,L));
-  const timeNet=pct(timeWins,total)-pct(timeLosses,total), timeLossPct=pct(timeLosses,total);
+  const timeNet=pct(timeWins,total)-pct(timeLosses,total), flagRate=pct(timeLosses,total);
   const fianchRate=pct(fianchetto,total), variantRate=pct(variantGames,total), nightShare=pct(nightGames,total);
   const avgOppElo=oppEloN?Math.round(oppEloSum/oppEloN):null;
+  const checksGiven=total?myChecks/total:0, avgLossMoves=lossN?Math.round(lossMovesSum/lossN):30, fastMateLossRate=pct(fastMateLoss,Math.max(1,L));
+  const zeitnotRate=clockMoves?pct(zeitnotMoves,clockMoves):null, avgFinalRatio=finalRatioN?finalRatioSum/finalRatioN:null;
+  const perfPerGame=perfN?perfSum/perfN:0, upsetRate=pct(upsetWins,Math.max(1,totalWins));
 
-  const grab=k=>stats?.[k]?.last?.rating, grabBest=k=>stats?.[k]?.best?.rating;
-  const elo=grab("chess_rapid")||grab("chess_blitz")||grab("chess_bullet")||grab("chess_daily")||1000;
-  const eloLabel=grab("chess_rapid")?"rapide":grab("chess_blitz")?"blitz":grab("chess_bullet")?"bullet":grab("chess_daily")?"corresp.":"—";
-  const catKey=grab("chess_rapid")?"chess_rapid":grab("chess_blitz")?"chess_blitz":grab("chess_bullet")?"chess_bullet":"chess_daily";
-  const peak=grabBest(catKey)||elo;
+  const ei=pickEloInfo(stats,tcFilter), elo=ei.elo, eloLabel=ei.label;
+  const peak=stats?.[ei.cat]?.best?.rating||elo;
   let lifetime=0; for(const k of ["chess_rapid","chess_blitz","chess_bullet","chess_daily"]){const r=stats?.[k]?.record; if(r)lifetime+=(r.win||0)+(r.loss||0)+(r.draw||0);} if(!lifetime)lifetime=total;
+  const tacticsR=stats?.tactics?.highest?.rating||null, puzzleBonus=tacticsR?clamp((tacticsR-elo)/60,-3,5):0;
 
   const base=eloBase(elo), OVR=base, adj=(d,c)=>clamp(Math.round(d),-c,c);
+  const tmpRaw = (zeitnotRate!==null) ? (timeNet*0.25 - zeitnotRate*0.22 - flagRate*0.3 + ((avgFinalRatio||0.2)-0.2)*18) : (timeNet*0.5 - flagRate*0.3);
   const S={
-    TAC: clamp(base+adj((rapidShare-45)*0.22,11),20,99),
-    ATT: clamp(base+adj((decisiveWinRate-60)*0.3 + (gambitRate+fianchRate*0.5)*0.1,13),20,99),
-    DEF: clamp(base+adj((longWinRate-40)*0.12 + (longLossRate-50)*0.1 + solidRate*0.12 + (40-lossRate)*0.1,13),20,99),
-    OUV: clamp(base+adj((favWR-50)*0.4 + clamp(repertoire-8,0,30)*0.25 + (knownRate-85)*0.1,13),20,99),
-    TMP: clamp(base+adj(timeNet*0.5,12),20,99),
-    MTL: clamp(base+adj((Math.max(bestWinStreak,worstLossStreak)-3)*2 + (longestDayStreak>=6?longestDayStreak-3:0) - (elo<2000?timeLossPct*0.15:0),15),12,99)
+    TAC: clamp(base+adj(perfPerGame*100 + (mateRate-22)*0.06 + puzzleBonus, 13),20,99),
+    ATT: clamp(base+adj((checksGiven-1.3)*4 + (decisiveWinRate-60)*0.12 + (gambitRate+fianchRate*0.5)*0.08, 13),20,99),
+    DEF: clamp(base+adj((avgLossMoves-32)*0.3 + solidRate*0.1 + (40-lossRate)*0.1 - fastMateLossRate*0.12, 13),20,99),
+    OUV: clamp(base+adj((favWR-winRate)*0.5 + clamp(dominance-12,0,40)*0.12 + (knownRate-85)*0.1, 13),20,99),
+    TMP: clamp(base+adj(tmpRaw, 12),20,99),
+    MTL: clamp(base+adj(-tiltDrop*0.6 + (bestWinStreak-4)*1.5 - (elo<2000?flagRate*0.12:0), 15),12,99)
   };
 
-  const arche=pickArchetype({total,winRate,lossRate,drawRate,mateRate,horloger,fianchRate,gambitRate,dominance,repertoire,knownRate,solidRate,lifetime,moves,bulletShare,worstStreak,variantRate,nightShare});
+  const arche=pickArchetype({total,winRate,lossRate,drawRate,mateRate,horloger,fianchRate,gambitRate,dominance,repertoire,knownRate,solidRate,lifetime,moves,bulletShare:pct(tcCount.bullet||0,total),variantRate,nightShare,upsetRate});
 
   const pos=[];
   if(bestWinStreak>=5) pos.push({s:bestWinStreak*7,t:`${bestWinStreak} victoires d'affilée`});
@@ -407,31 +423,32 @@ function analyse(user,games,profile,stats){
   if(peak>=1200&&peak-elo>=50&&peak-elo<250) pos.push({s:30+(peak-1000)/40,t:`a déjà touché ${peak} en pic`});
   if(fastMate<=15&&mateWins>=3) pos.push({s:40-fastMate,t:`mat express en ${fastMate} coups`});
   if(curStreak>=4&&curRes==="W") pos.push({s:curStreak*6,t:`en feu : ${curStreak} victoires de suite`});
+  if(upsetRate>=20&&totalWins>=20) pos.push({s:upsetRate,t:`${upsetRate}% de ses victoires contre plus fort`});
   pos.sort((a,b)=>b.s-a.s);
   const neg=[];
-  if(worstLossStreak>=4) neg.push({s:worstLossStreak*7,t:`${worstLossStreak} défaites d'affilée`});
   if(peak-elo>=250) neg.push({s:(peak-elo)/4,t:`descente en enfer : ${peak} → ${elo}`});
-  if(timeLossPct>=18) neg.push({s:timeLossPct,t:`${timeLossPct}% de défaites au flag`});
+  if(flagRate>=18) neg.push({s:flagRate,t:`${flagRate}% de défaites au flag`});
   if(nemesis&&nemesis.l>=4) neg.push({s:nemesis.l*5,t:`battu ${nemesis.l}× par ${nemesis.nm}`});
   if(worstLossElo<elo-300&&worstLossElo<9999) neg.push({s:(elo-worstLossElo)/10,t:`battu par un ${worstLossElo}`});
   if(winRate<=42) neg.push({s:(45-winRate)*2,t:`seulement ${winRate}% de winrate`});
-  if(curStreak>=4&&curRes==="L") neg.push({s:curStreak*6,t:`en chute : ${curStreak} défaites de suite`});
+  if(fastMateLossRate>=25) neg.push({s:fastMateLossRate,t:`${fastMateLossRate}% de défaites par mat rapide`});
+  if(zeitnotRate!==null&&zeitnotRate>=30) neg.push({s:zeitnotRate,t:`${zeitnotRate}% de coups en zeitnot`});
   neg.sort((a,b)=>b.s-a.s);
-  const posT=pos[0]?pos[0].t:`${winRate}% de winrate`, negT=neg[0]?neg[0].t:`${lossRate}% de défaites`;
+  const posT=pos[0]?pos[0].t:`${winRate}% de winrate`, negT=neg[0]?neg[0].t:`${drawRate}% de parties nulles`;
   const flagship={txt:`${posT} — ${negT}`};
   const feats=[]; if(pos[0])feats.push({t:posT}); if(neg[0])feats.push({t:negT}); pos.slice(1,2).forEach(p=>feats.push({t:p.t}));
 
   const tier=tierOf(elo), piece=(tier.key==="troll")?"🤡":(whiteN>=blackN?"♔":"♚");
-
   return { user, name:(profile.name||user), country:flag(profile.country), title:(profile.title||""),
     elo, eloLabel, peak, base, OVR, tier:tier.key, tierName:tier.name, S, arche, piece, flagship, feats,
     W,L,D,total,winRate,lifetime,modeLabel,sampleRate:pct(total,lifetime),
     whiteWR:pct(whiteW,whiteN),blackWR:pct(blackW,blackN),
     horloger,drawRate,worstStreak,repertoire,knownRate,solidRate,favWR,favOpenings,nemesis,punchball,
-    bestWinStreak,worstLossStreak,curStreak,curRes,topBeat,variantRate,nightShare,avgOppElo };
+    bestWinStreak,worstLossStreak,curStreak,curRes,topBeat,variantRate,nightShare,avgOppElo,
+    checksGiven:Math.round(checksGiven*10)/10, perfPerGame:Math.round(perfPerGame*100), zeitnotRate, postLossWR, tiltDrop };
 }
 
-/* ---------- ARCHÉTYPES (toujours un résultat, jamais d'équilibriste) ---------- */
+/* ---------- ARCHÉTYPES (toujours un résultat) ---------- */
 function pickArchetype(m){
   const C=[], hi=(v,t,th)=>(v-t)/(th-t), lo=(v,t,th)=>(t-v)/(t-th), add=(n,t,d,w)=>C.push({norm:n,t,d,why:w});
   add(hi(m.winRate,50,60),"LE ROULEUR","écrase tout",`${m.winRate}% de victoires`);
@@ -445,7 +462,7 @@ function pickArchetype(m){
   add(hi(m.moves,40,55),"LE MARATHONIEN","parties à rallonge",`${m.moves} coups par partie en moyenne`);
   add(lo(m.moves,40,22),"LE SPEEDRUNNER","parties éclair",`${m.moves} coups par partie en moyenne`);
   add(hi(m.bulletShare,25,65),"LE FLAMBEUR","accro au bullet",`${m.bulletShare}% de tes parties sont du bullet`);
-  add(hi(m.worstStreak,2,5),"LE TILTÉ","enchaîne les défaites",`pire série : ${m.worstStreak} défaites dans une journée`);
+  add(hi(m.upsetRate,10,35),"LE TOMBEUR DE GÉANTS","bat plus fort que lui",`${m.upsetRate}% de ses victoires contre des joueurs mieux classés`);
   add(hi(m.solidRate,12,40)+(m.lossRate<=38?0.2:0),"LE MUR","indéboulonnable",`${m.solidRate}% d'ouvertures solides et tu perds peu`);
   add(hi(m.variantRate,3,25),"L'EXOTIQUE","fan de variantes",`${m.variantRate}% de parties en variantes (960, roi de la colline…)`);
   add(hi(m.nightShare,18,45),"LE NOCTAMBULE","joue dans le noir",`${m.nightShare}% de tes parties entre 22h et 6h`);
@@ -456,6 +473,7 @@ function pickArchetype(m){
 
 /* ---------- RENDER ---------- */
 function cardHTML(d){
+  const foot = d.footRows || [["NÉMÉSIS",d.nemesis?d.nemesis.nm:"—"],["PUNCHING-BALL",d.punchball?d.punchball.nm:"—"],["PARTIES JOUÉES",d.lifetime.toLocaleString("fr-FR")],["BILAN",`${d.W}V ${d.D}N ${d.L}D · ${d.winRate}%`]];
   return `
     <div class="c-top">
       <div class="c-ovr">${d.OVR}<small>OVR</small></div>
@@ -475,13 +493,8 @@ function cardHTML(d){
       ${stat("attaque",d.S.ATT)}${stat("rythme",d.S.TMP)}
       ${stat("défense",d.S.DEF)}${stat("mental",d.S.MTL)}
     </div>
-    <div class="c-foot">
-      <div><span class="lab">NÉMÉSIS</span><span class="val">${d.nemesis?esc(d.nemesis.nm):"—"}</span></div>
-      <div><span class="lab">PUNCHING-BALL</span><span class="val">${d.punchball?esc(d.punchball.nm):"—"}</span></div>
-      <div><span class="lab">PARTIES JOUÉES</span><span class="val">${d.lifetime.toLocaleString("fr-FR")}</span></div>
-      <div><span class="lab">BILAN</span><span class="val">${d.W}V ${d.D}N ${d.L}D · ${d.winRate}%</span></div>
-    </div>
-    <div class="c-watermark">@${esc(d.user)} · ${SITE}</div>`;
+    <div class="c-foot">${foot.map(r=>`<div><span class="lab">${esc(r[0])}</span><span class="val">${esc(r[1])}</span></div>`).join("")}</div>
+    <div class="c-watermark">${d.total||0} parties analysées<br>${SITE}</div>`;
 }
 function applyCard(el,d){ el.className="card "+d.tier; el.innerHTML=cardHTML(d); }
 
@@ -492,57 +505,42 @@ function render(d){
   $("breakdown").innerHTML=`
     <div class="bd-card arche-card">
       <h3>archétype + faits marquants</h3>
-      <div class="arche-title">${d.arche.t}</div>
-      <div class="arche-sub">« ${d.arche.d} »</div>
+      <div class="arche-title">${d.arche.t}</div><div class="arche-sub">« ${d.arche.d} »</div>
       <p class="note arche-why">${esc(d.arche.why)}.</p>
       <div class="feats">${(d.feats.length?d.feats:[{t:d.flagship.txt}]).map(f=>`<div class="feat">${esc(f.t)}</div>`).join("")}</div>
     </div>
-    <div class="bd-card">
-      <h3>radar des notes</h3>
-      <div class="radar-wrap">${radar([{S:d.S,color:TIERCOL[d.tier]||"#46c2a8"}])}</div>
-    </div>
+    <div class="bd-card"><h3>radar des notes</h3><div class="radar-wrap">${radar([{S:d.S,color:TIERCOL[d.tier]||"#46c2a8"}])}</div></div>
     <div class="bd-card">
       <h3>le détail (vrai data)</h3>
-      <p class="note" style="margin:-4px 0 12px">les 6 notes sont <b>ancrées sur ton elo</b> (base ${d.base}) puis ajustées selon ton style. l'OVR suit ton elo.</p>
+      <p class="note" style="margin:-4px 0 12px">notes ancrées sur l'elo (base ${d.base}) + ajustées par tes vraies stats (perf, horloges, échecs…). récréatif, pas une analyse moteur.</p>
       <div class="kv">
-        <div class="b"><div class="n gold">${d.lifetime.toLocaleString("fr-FR")}</div><div class="l">parties jouées (total)</div></div>
+        <div class="b"><div class="n gold">${d.lifetime.toLocaleString("fr-FR")}</div><div class="l">parties (total)</div></div>
         <div class="b"><div class="n">${d.modeLabel}</div><div class="l">mode préféré</div></div>
         <div class="b"><div class="n gold">${d.winRate}%</div><div class="l">win rate global</div></div>
-        <div class="b"><div class="n good">${d.whiteWR}%</div><div class="l">win rate ♔ blanc</div></div>
-        <div class="b"><div class="n good">${d.blackWR}%</div><div class="l">win rate ♚ noir</div></div>
-        <div class="b"><div class="n">${d.avgOppElo||"—"}</div><div class="l">elo moyen des adversaires</div></div>
+        <div class="b"><div class="n ${d.perfPerGame>0?'good':d.perfPerGame<0?'bad':''}">${d.perfPerGame>0?'+':''}${d.perfPerGame}</div><div class="l">perf vs elo /100</div></div>
+        <div class="b"><div class="n">${d.avgOppElo||"—"}</div><div class="l">elo moyen adversaires</div></div>
         <div class="b"><div class="n ${d.curRes==="W"?"good":d.curRes==="L"?"bad":""}">${cur}</div><div class="l">série en cours</div></div>
-        <div class="b"><div class="n">${d.horloger}%</div><div class="l">victoires au temps</div></div>
+        <div class="b"><div class="n">${d.checksGiven}</div><div class="l">échecs donnés / partie</div></div>
+        <div class="b"><div class="n">${d.zeitnotRate!==null?d.zeitnotRate+"%":"—"}</div><div class="l">coups en zeitnot</div></div>
         <div class="b"><div class="n good">${d.knownRate}%</div><div class="l">ouvertures connues</div></div>
         <div class="b"><div class="n">${d.solidRate}%</div><div class="l">ouvertures solides</div></div>
-        <div class="b"><div class="n">${d.repertoire}</div><div class="l">ouvertures au répertoire</div></div>
-        <div class="b"><div class="n ${d.worstStreak>=5?"bad":""}">${d.worstStreak}</div><div class="l">pire série défaites / jour</div></div>
+        <div class="b"><div class="n">${d.postLossWR}%</div><div class="l">winrate après défaite</div></div>
+        <div class="b"><div class="n ${d.worstStreak>=5?"bad":""}">${d.worstStreak}</div><div class="l">pire série déf. / jour</div></div>
       </div>
     </div>
-    <div class="bd-card">
-      <h3>ouvertures les plus jouées</h3>
-      <div class="ol">${d.favOpenings.map(o=>`<div class="o"><span class="nm">${esc(o.nm)}</span><span class="wr" style="color:${o.wr>=55?"var(--acc2)":o.wr<45?"var(--bad)":"var(--muted)"}">${o.n}× · ${o.wr}%</span></div>`).join("")}</div>
-    </div>
-    <div class="bd-card">
-      <h3>tête à tête (parties classées only)</h3>
-      <div class="ol">
+    <div class="bd-card"><h3>ouvertures les plus jouées</h3><div class="ol">${d.favOpenings.map(o=>`<div class="o"><span class="nm">${esc(o.nm)}</span><span class="wr" style="color:${o.wr>=55?"var(--acc2)":o.wr<45?"var(--bad)":"var(--muted)"}">${o.n}× · ${o.wr}%</span></div>`).join("")}</div></div>
+    <div class="bd-card"><h3>tête à tête (parties classées)</h3><div class="ol">
         <div class="o"><span class="nm">némésis : <b>${d.nemesis?esc(d.nemesis.nm):"aucun"}</b></span><span class="wr">${d.nemesis?`${d.nemesis.l}D / ${d.nemesis.n}`:""}</span></div>
         <div class="o"><span class="nm">punching-ball : <b>${d.punchball?esc(d.punchball.nm):"aucun"}</b></span><span class="wr">${d.punchball?`${d.punchball.w}V / ${d.punchball.n}`:""}</span></div>
-      </div>
-      <p class="note" style="margin-top:10px">les bots et parties non classées sont exclus du calcul.</p>
-    </div>
-    <p class="note" style="text-align:center">échantillon : <b>${d.total.toLocaleString("fr-FR")}</b> parties récentes sur ${d.lifetime.toLocaleString("fr-FR")} (~${d.sampleRate}%).</p>
-  `;
+      </div><p class="note" style="margin-top:10px">bots et parties non classées exclus.</p></div>
+    <p class="note" style="text-align:center">échantillon : <b>${d.total.toLocaleString("fr-FR")}</b> parties récentes sur ${d.lifetime.toLocaleString("fr-FR")} (~${d.sampleRate}%).</p>`;
 }
 
 function renderCompare(a,b){
   document.body.className="theme-"+(a.OVR>=b.OVR?a.tier:b.tier);
   const cardBlock=(d,id)=>`<div class="card-stage"><div class="card ${d.tier}" id="${id}"></div></div>`;
   const rows=[["OVR",a.OVR,b.OVR],["tactique",a.S.TAC,b.S.TAC],["ouvertures",a.S.OUV,b.S.OUV],["attaque",a.S.ATT,b.S.ATT],["rythme",a.S.TMP,b.S.TMP],["défense",a.S.DEF,b.S.DEF],["mental",a.S.MTL,b.S.MTL]];
-  const rowHTML=rows.map(([lab,x,y])=>{
-    const lw=x>y?"win":"lose", rw=y>x?"win":"lose";
-    return `<div class="cmp-row"><div class="p l ${x===y?'':lw}">${x}</div><div class="lab">${lab}</div><div class="p r ${x===y?'':rw}">${y}</div></div>`;
-  }).join("");
+  const rowHTML=rows.map(([lab,x,y])=>`<div class="cmp-row"><div class="p l ${x===y?'':x>y?'win':'lose'}">${x}</div><div class="lab">${lab}</div><div class="p r ${x===y?'':y>x?'win':'lose'}">${y}</div></div>`).join("");
   $("compareResult").innerHTML=`
     <div class="cmp-cards">${cardBlock(a,"cardA")}${cardBlock(b,"cardB")}</div>
     <div class="bd-card cmp-table">
@@ -554,7 +552,6 @@ function renderCompare(a,b){
   applyCard($("cardA"),a); applyCard($("cardB"),b);
 }
 
-/* radar hexagone : sets = [{S,color}] */
 function radar(sets){
   const keys=["TAC","OUV","ATT","TMP","DEF","MTL"], cx=130,cy=120,R=82;
   const pt=(i,r)=>{const a=(-90+i*60)*Math.PI/180;return [cx+Math.cos(a)*r,cy+Math.sin(a)*r];};
@@ -562,7 +559,7 @@ function radar(sets){
   [0.25,0.5,0.75,1].forEach(g=>{ s+=`<polygon points="${keys.map((_,i)=>pt(i,R*g).join(",")).join(" ")}" fill="none" stroke="#2a3340" stroke-width="1"/>`; });
   keys.forEach((k,i)=>{ const [x,y]=pt(i,R); s+=`<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="#2a3340"/>`; const [lx,ly]=pt(i,R+16); s+=`<text x="${lx}" y="${ly}" font-size="10" fill="#8893a3" text-anchor="middle" dominant-baseline="middle" font-family="monospace">${k}</text>`; });
   sets.forEach(st=>{ const poly=keys.map((k,i)=>pt(i,R*(st.S[k]/99)).join(",")).join(" "); s+=`<polygon points="${poly}" fill="${st.color}33" stroke="${st.color}" stroke-width="2"/>`; });
-  s+=`</svg>`; return s;
+  return s+`</svg>`;
 }
 
 function stat(lab,v){ return `<div class="stat"><b>${v}</b><span>${lab}</span></div>`; }
@@ -570,7 +567,9 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 
 async function exportPNG(copy){
   await document.fonts.ready;
-  const canvas=await html2canvas($("card"),{scale:3,backgroundColor:null,logging:false,useCORS:true});
+  const card=$("card"); card.classList.add("exporting");
+  let canvas; try{ canvas=await html2canvas(card,{scale:3,backgroundColor:null,useCORS:true,width:card.offsetWidth,height:card.offsetHeight,scrollX:0,scrollY:0,windowWidth:document.documentElement.offsetWidth}); }
+  finally{ card.classList.remove("exporting"); }
   if(copy){ canvas.toBlob(async b=>{ try{ await navigator.clipboard.write([new ClipboardItem({"image/png":b})]); setStatus("image copiée ✓"); }catch{ setStatus("copie non supportée, utilise télécharger",true);} }); }
   else{ const a=document.createElement("a"); a.download="chesscard-"+($("user").value.trim()||"joueur")+".png"; a.href=canvas.toDataURL("image/png"); a.click(); }
 }
@@ -580,6 +579,24 @@ async function copyLink(){
   try{ await navigator.clipboard.writeText(url); setStatus("lien copié ✓ → "+url); }catch{ setStatus(url,false); }
 }
 
+/* ---------- easter egg créateur ---------- */
+function creatorData(){
+  return { user:"lusowall", name:"LUSOWALL", country:"🇧🇪", title:"DEV",
+    elo:3000, eloLabel:"créateur", peak:3000, base:99, OVR:99, tier:"legend", tierName:"CRÉATEUR",
+    S:{TAC:99,OUV:99,ATT:99,TMP:99,DEF:99,MTL:99},
+    arche:{t:"LE CRÉATEUR",d:"mi-codeur mi-dieu",why:"a conçu chess.card de A à Z, à la main, pour le plaisir"},
+    piece:"👑", avatar:null,
+    flagship:{txt:"a développé ce site — l'a fait gratuit"},
+    feats:[{t:"a codé chess.card de zéro"},{t:"l'a rendu gratuit (grosse erreur business)"}],
+    footRows:[["♥ MERCI","BEAUCOUP"],["AUX","UTILISATEURS"],["STATUT","FONDATEUR"],["PRIX","0€ (gratuit)"]],
+    W:999,L:0,D:0,total:0,winRate:100,lifetime:99999,modeLabel:"TOUTES",sampleRate:100,
+    whiteWR:100,blackWR:100,avgOppElo:3000,curStreak:99,curRes:"W",
+    horloger:99,drawRate:0,worstStreak:0,repertoire:99,knownRate:100,solidRate:50,favWR:100,
+    favOpenings:[{nm:"Toutes les ouvertures",n:999,wr:100}], nemesis:null,punchball:null,
+    bestWinStreak:99,worstLossStreak:0,topBeat:3500,variantRate:50,nightShare:80,
+    checksGiven:9.9,perfPerGame:99,zeitnotRate:0,postLossWR:100,tiltDrop:0 };
+}
+
 /* ---------- TEST BUTTON - A SUPPRIMER ---------- */
 let TEST_I=0;
 function fakeData(){
@@ -587,23 +604,23 @@ function fakeData(){
   const elo=tier.key==="legend"?3200:Math.round((tier.min+Math.min(tier.max,tier.min+499))/2);
   const base=eloBase(elo), rnd=(a,b)=>Math.round(a+Math.random()*(b-a));
   const S={TAC:clamp(base+rnd(-9,11),20,99),OUV:clamp(base+rnd(-9,12),20,99),ATT:clamp(base+rnd(-10,12),20,99),TMP:clamp(base+rnd(-9,10),20,99),DEF:clamp(base+rnd(-9,11),20,99),MTL:clamp(base+rnd(-11,12),12,99)};
-  const ar=[["LE ROULEUR","écrase tout","58% de victoires"],["LE SNIPER","fou en fianchetto","fianchetto dans 41% des parties"],["LE NOCTAMBULE","joue dans le noir","52% des parties la nuit"],["LE MUR","indéboulonnable","beaucoup d'ouvertures solides"]][rnd(0,3)];
+  const ar=[["LE ROULEUR","écrase tout","58% de victoires"],["LE TOMBEUR DE GÉANTS","bat plus fort que lui","28% de victoires contre plus fort"],["LE NOCTAMBULE","joue dans le noir","52% des parties la nuit"],["LE MUR","indéboulonnable","beaucoup d'ouvertures solides"]][rnd(0,3)];
   return { user:"test_"+tier.key, name:tier.name+" PLAYER", country:"🇧🇪",
     title:(["platine","monstre","legend"].includes(tier.key)?(tier.key==="legend"?"GM":tier.key==="monstre"?"IM":"FM"):""),
     elo, base, OVR:base, tier:tier.key, tierName:tier.name, S, arche:{t:ar[0],d:ar[1],why:ar[2]},
     piece:tier.key==="troll"?"🤡":"♔", avatar:null,
-    flagship:{txt:`a battu un ${elo+rnd(120,300)} — ${rnd(5,18)} défaites d'affilée`},
-    feats:[{t:`${rnd(6,15)} victoires d'affilée`},{t:`${rnd(5,16)} défaites d'affilée`}],
+    flagship:{txt:`a battu un ${elo+rnd(120,300)} — battu par un ${elo-rnd(200,400)}`},
+    feats:[{t:`${rnd(6,15)} victoires d'affilée`},{t:`battu par un ${elo-rnd(200,400)}`}],
     W:rnd(80,140),L:rnd(50,90),D:rnd(5,25),total:200,winRate:rnd(42,62),lifetime:rnd(500,40000),
     modeLabel:["BULLET","BLITZ","RAPIDE"][rnd(0,2)],sampleRate:rnd(1,40),
     whiteWR:rnd(45,60),blackWR:rnd(40,58),avgOppElo:elo+rnd(-60,60),curStreak:rnd(0,7),curRes:["W","L"][rnd(0,1)],
     horloger:rnd(10,55),drawRate:rnd(2,20),worstStreak:rnd(2,8),repertoire:rnd(8,35),knownRate:rnd(70,98),solidRate:rnd(5,55),favWR:rnd(45,65),
     favOpenings:[{nm:"Sicilian Defense",n:rnd(20,60),wr:rnd(45,65)},{nm:"Caro Kann Defense",n:rnd(10,30),wr:rnd(40,60)},{nm:"Queens Gambit",n:rnd(8,20),wr:rnd(40,60)}],
-    nemesis:{nm:"DarkKnight_99",l:rnd(4,9),n:rnd(10,15)}, punchball:{nm:"easyfood42",w:rnd(5,10),n:rnd(8,12)} };
+    nemesis:{nm:"DarkKnight_99",l:rnd(4,9),n:rnd(10,15)}, punchball:{nm:"easyfood42",w:rnd(5,10),n:rnd(8,12)},
+    checksGiven:(rnd(8,22)/10),perfPerGame:rnd(-8,8),zeitnotRate:rnd(5,40),postLossWR:rnd(35,60) };
 }
 function testCycle(){ const d=fakeData(); render(d); $("result").classList.add("on"); setStatus("RENDU TEST : "+d.tierName); }
 
-/* ---------- interface ---------- */
 function setMode(mode){
   const solo=mode==="solo";
   $("modeSolo").classList.toggle("on",solo); $("modeCompare").classList.toggle("on",!solo);
@@ -623,12 +640,9 @@ $("modeCompare").addEventListener("click",()=>setMode("compare"));
 $("testTop").addEventListener("click",testCycle);
 $("testBot").addEventListener("click",testCycle);
 
-/* deep link ?user= ou ?user=a&vs=b */
-(function(){
-  const p=new URLSearchParams(location.search), u=p.get("user"), vs=p.get("vs");
+(function(){ const p=new URLSearchParams(location.search), u=p.get("user"), vs=p.get("vs");
   if(u&&vs){ setMode("compare"); $("userA").value=u; $("userB").value=vs; compareRun(); }
-  else if(u){ $("user").value=u; run(); }
-})();
+  else if(u){ $("user").value=u; run(); } })();
 </script>
 </body>
 </html>
