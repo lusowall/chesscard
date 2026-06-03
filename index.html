@@ -590,7 +590,7 @@ function cardHTML(d){
 function applyCard(el,d){ el.className="card "+d.tier; el.innerHTML=cardHTML(d); }
 
 function backHTML(d){
-  const rows=[["perf vs elo",(d.perfPerGame>0?"+":"")+d.perfPerGame+" /100"],["échecs donnés/partie",d.checksGiven],["coups en zeitnot",d.zeitnotRate!==null?d.zeitnotRate+"%":"—"],["winrate après défaite",d.postLossWR+"%"],["elo moyen adverse",d.avgOppElo||"—"],["ouvertures déjà jouées",(d.playedRate!=null?d.playedRate:d.knownRate)+"%"],["partie la + longue",(d.maxMoves||"—")+" coups"],["partie la + courte",(d.minMoves||"—")+" coups"],["série en cours",d.curStreak>=2?d.curStreak+(d.curRes==="W"?" V":" D"):"—"]];
+  const rows=[["perf vs elo",(d.perfPerGame>0?"+":"")+d.perfPerGame+" /100"],["échecs donnés/partie",d.checksGiven],["coups en zeitnot",d.zeitnotRate!==null?d.zeitnotRate+"%":"—"],["winrate après défaite",d.postLossWR+"%"],["elo moyen adverse",d.avgOppElo||"—"],["partie la + longue",(d.maxMoves||"—")+" coups"],["partie la + courte",(d.minMoves||"—")+" coups"],["série en cours",d.curStreak>=2?d.curStreak+(d.curRes==="W"?" V":" D"):"—"]];
   return `<div class="c-top"><div class="c-ovr" style="font-size:30px">détail<small>${esc(d.name).slice(0,14)}</small></div><div class="c-meta">${d.tierName} · ${d.elo}</div></div>
     <div class="back-list">${rows.map(r=>`<div><span>${r[0]}</span><b>${esc(String(r[1]))}</b></div>`).join("")}</div>
     <div class="c-watermark" style="margin-top:auto">↻ recto · ${SITE}</div>`;
@@ -635,7 +635,7 @@ function render(d){
         <div class="b"><div class="n ${d.curRes==="W"?"good":d.curRes==="L"?"bad":""}">${cur}</div><div class="l">série en cours</div></div>
         <div class="b"><div class="n">${d.checksGiven}</div><div class="l">échecs donnés / partie</div></div>
         <div class="b" title="Part de tes coups joués avec très peu de temps à la pendule (moins de 15s en blitz/rapide, 5s en bullet). Élevé = tu joues souvent dans l'urgence."><div class="n">${d.zeitnotRate!==null?d.zeitnotRate+"%":"—"}</div><div class="l">coups en zeitnot</div></div>
-        <div class="b" title="Part de tes parties jouées avec une ouverture que tu joues régulièrement (≥3 fois). Élevé = vrai répertoire."><div class="n good">${d.playedRate}%</div><div class="l">ouvertures déjà jouées</div></div>
+        <div class="b" title="Ton meilleur classement atteint dans cette cadence."><div class="n gold">${d.peak||d.elo}</div><div class="l">meilleur elo (pic)</div></div>
         <div class="b"><div class="n">${d.postLossWR}%</div><div class="l">winrate après défaite</div></div>
         <div class="b"><div class="n ${d.worstStreak>=5?"bad":""}">${d.worstStreak}</div><div class="l">pire série déf. / jour</div></div>
       </div>
