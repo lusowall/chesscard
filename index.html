@@ -118,7 +118,11 @@
   .dl button{font-family:"JetBrains Mono";font-weight:700;font-size:12px;background:#0c1016;border:1px solid var(--line);color:var(--ink);padding:11px 14px;border-radius:10px;cursor:pointer}
   .dl button:hover{border-color:var(--acc2)}
 
-  .breakdown{display:flex;flex-direction:column;gap:14px;width:100%}
+  .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start;width:100%}
+  .breakdown>.bd-card{margin:0}
+  .bd-wide{grid-column:1/-1}
+  @media(min-width:821px){.card-stage{position:sticky;top:20px}}
+  @media(max-width:720px){.breakdown{grid-template-columns:1fr}}
   .bd-card{background:linear-gradient(180deg,var(--bg2),#0c1016);border:1px solid var(--line);border-radius:14px;padding:16px 18px}
   .bd-card h3{font-family:"JetBrains Mono";font-size:11px;letter-spacing:2px;text-transform:uppercase;color:var(--acc2);margin-bottom:12px;font-weight:700}
   .kv{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px}
@@ -324,7 +328,7 @@ async function buildData(user,target,sId,bId,tcFilter){
 async function run(){
   const user=$("user").value.trim().toLowerCase();
   if(!user){ setStatus("euh il manque le pseudo",true); return; }
-  if(user==="lusowall" && !window.__lw){ window.__lw=true; render(creatorData()); $("result").classList.add("on"); setStatus("✨ carte créateur — re-cherche lusowall pour les vraies stats"); $("result").scrollIntoView({behavior:"smooth",block:"start"}); return; }
+  if(user==="lusowall" && !window.__lw){ window.__lw=true; showcaseStop(); render(creatorData()); $("result").classList.add("on"); setStatus("✨ carte créateur — re-cherche lusowall pour les vraies stats"); $("result").scrollIntoView({behavior:"smooth",block:"start"}); return; }
   const tc=$("tc").value, dv=$("depth").value, target=dv==="all"?Infinity:parseInt(dv,10);
   $("go").disabled=true; $("result").classList.remove("on"); showcaseStop();
   setStatus("récupération du profil…"); setBar(4); showSkeleton();
@@ -618,7 +622,7 @@ function render(d){
     </div>
     <div class="bd-card"><h3>radar des notes</h3><div class="radar-wrap">${radar([{S:d.S,color:TIERCOL[d.tier]||"#46c2a8"}])}</div></div>
     ${d.eloSeries&&d.eloSeries.length>=2?`<div class="bd-card"><h3>courbe d'elo (échantillon)</h3>${sparkline(d.eloSeries,TIERCOL[d.tier]||"#46c2a8")}</div>`:""}
-    <div class="bd-card">
+    <div class="bd-card bd-wide">
       <h3>le détail (vrai data)</h3>
       <p class="note" style="margin:-4px 0 12px">notes ancrées sur l'elo (base ${d.base}) + ajustées par tes vraies stats (perf, horloges, échecs…). récréatif, pas une analyse moteur.</p>
       <div class="kv">
@@ -644,8 +648,8 @@ function render(d){
         <div class="o"><span class="nm">némésis : <b>${d.nemesis?esc(d.nemesis.nm):"aucun"}</b></span><span class="wr">${d.nemesis?`${d.nemesis.l}D / ${d.nemesis.n}`:""}</span></div>
         <div class="o"><span class="nm">punching-ball : <b>${d.punchball?esc(d.punchball.nm):"aucun"}</b></span><span class="wr">${d.punchball?`${d.punchball.w}V / ${d.punchball.n}`:""}</span></div>
       </div><p class="note" style="margin-top:10px">bots et parties non classées exclus.</p></div>
-    <div class="bd-card"><h3>quand tu joues (heatmap)</h3>${heatmapHTML(d.heat,d.heatMax,TIERCOL[d.tier]||"#46c2a8")}</div>
-    <div class="bd-card"><h3>durées & fins de partie</h3>
+    <div class="bd-card bd-wide"><h3>quand tu joues (heatmap)</h3>${heatmapHTML(d.heat,d.heatMax,TIERCOL[d.tier]||"#46c2a8")}</div>
+    <div class="bd-card bd-wide"><h3>durées & fins de partie</h3>
       <div class="kv" style="margin-bottom:12px">
         <div class="b"><div class="n">${d.maxMoves||"—"}</div><div class="l">partie la + longue (coups)</div></div>
         <div class="b"><div class="n">${d.minMoves||"—"}</div><div class="l">partie la + courte (coups)</div></div>
@@ -655,7 +659,7 @@ function render(d){
       </div>
       <p class="note" style="margin-top:8px">${[["mat"],["abandon"],["temps"],["nulle"]].map(([k])=>`${k} ${pct(endT[k]||0,endTot)}%`).join(" · ")}</p>
     </div>
-    <p class="note" style="text-align:center">échantillon : <b>${d.total.toLocaleString("fr-FR")}</b> parties récentes sur ${d.lifetime.toLocaleString("fr-FR")} (~${d.sampleRate}%).</p>`;
+    <p class="note bd-wide" style="text-align:center">échantillon : <b>${d.total.toLocaleString("fr-FR")}</b> parties récentes sur ${d.lifetime.toLocaleString("fr-FR")} (~${d.sampleRate}%).</p>`;
 }
 
 function renderCompare(a,b){
