@@ -1,1 +1,1 @@
-# Infos Adversaire Chess.com
+# Chess.Card
