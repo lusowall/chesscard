@@ -118,7 +118,7 @@
   .dl button{font-family:"JetBrains Mono";font-weight:700;font-size:12px;background:#0c1016;border:1px solid var(--line);color:var(--ink);padding:11px 14px;border-radius:10px;cursor:pointer}
   .dl button:hover{border-color:var(--acc2)}
 
-  .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start;width:100%}
+  .breakdown{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-content:start;align-items:start;width:100%}
   .breakdown>.bd-card{margin:0}
   .bd-wide{grid-column:1/-1}
   @media(min-width:821px){.card-stage{position:sticky;top:20px}}
@@ -228,7 +228,7 @@
       <div class="field grow"><label for="userA">joueur 1</label><input id="userA" placeholder="ex : hikaru" autocomplete="off" spellcheck="false"></div>
       <div class="field grow"><label for="userB">joueur 2</label><input id="userB" placeholder="ex : magnuscarlsen" autocomplete="off" spellcheck="false"></div>
       <div class="field"><label for="depthC">parties / joueur</label>
-        <select id="depthC"><option value="500">500</option><option value="1000" selected>1000</option><option value="2500">2500</option><option value="5000">5000</option><option value="all">tout</option></select>
+        <select id="depthC"><option value="500">500</option><option value="1000">1000</option><option value="2500">2500</option><option value="5000">5000</option><option value="all" selected>tout</option></select>
       </div>
       <button class="go" id="goCompare">comparer</button>
     </div>
@@ -296,9 +296,9 @@ function sparkline(vals,color){
   const pts=vals.map((v,i)=>[pad+i/(vals.length-1)*(w-2*pad), h-pad-(v-min)/rng*(h-2*pad)]);
   const path=pts.map(p=>p[0].toFixed(1)+","+p[1].toFixed(1)).join(" ");
   const area=`${pad},${h-pad} ${path} ${(w-pad)},${h-pad}`;
-  return `<svg viewBox="0 0 ${w} ${h}" width="100%" preserveAspectRatio="none" style="display:block">
+  return `<svg viewBox="0 0 ${w} ${h}" width="100%" height="120" preserveAspectRatio="none" style="display:block;height:120px">
     <polygon points="${area}" fill="${color}22"/>
-    <polyline points="${path}" fill="none" stroke="${color}" stroke-width="2"/>
+    <polyline points="${path}" fill="none" stroke="${color}" stroke-width="1.6" vector-effect="non-scaling-stroke"/>
     <text x="2" y="12" font-size="11" fill="#8893a3" font-family="monospace">${max}</text>
     <text x="2" y="${h-2}" font-size="11" fill="#8893a3" font-family="monospace">${min}</text>
   </svg>`;
@@ -420,7 +420,7 @@ function analyse(user,games,profile,stats,tcFilter){
     const op=openingFromGame(g); openings[op]=openings[op]||{n:0,w:0}; openings[op].n++; if(res==="W")openings[op].w++;
     if(g.rules&&g.rules!=="chess")variantGames++;
     if(g.time_control)tcCtrl[g.time_control]=(tcCtrl[g.time_control]||0)+1;
-    if(g.rated&&me.rating)eloSeries.push({t:(g.end_time||0)*1000,r:me.rating});
+    if(g.rated&&me.rating)eloSeries.push({t:(g.end_time||0)*1000,r:me.rating,c:g.time_class});
     if(g.rated){ const on=you.username; opp[on]=opp[on]||{n:0,w:0,l:0}; opp[on].n++; if(res==="W")opp[on].w++; else if(res==="L")opp[on].l++; }
     const t=(g.end_time||0)*1000, dt=new Date(t), day=dt.toISOString().slice(0,10), h=dt.getHours(), dow=dt.getDay();
     if(h>=22||h<6)nightGames++;
@@ -469,7 +469,6 @@ function analyse(user,games,profile,stats,tcFilter){
   const sigKey=Object.entries(tcCtrl).sort((a,b)=>b[1]-a[1])[0]?.[0]||null;
   const signatureTC=fmtTC(sigKey);
   const moves=total?Math.round(movesSum/total):40;
-  const eloSorted=eloSeries.slice().sort((a,b)=>a.t-b.t).map(x=>x.r);
   const joinYear=profile.joined?new Date(profile.joined*1000).getFullYear():null;
   const accountYears=profile.joined?Math.max(0,(Date.now()/1000-profile.joined)/31557600):0;
 
@@ -483,6 +482,9 @@ function analyse(user,games,profile,stats,tcFilter){
   const perfPerGame=perfN?perfSum/perfN:0, upsetRate=pct(upsetWins,Math.max(1,totalWins));
 
   const ei=pickEloInfo(stats,tcFilter), elo=ei.elo, eloLabel=ei.label;
+  const primaryClass=ei.cat.replace("chess_","");
+  let eloSorted=eloSeries.filter(x=>x.c===primaryClass); if(eloSorted.length<2)eloSorted=eloSeries.slice();
+  eloSorted=eloSorted.sort((a,b)=>a.t-b.t).map(x=>x.r);
   const peak=stats?.[ei.cat]?.best?.rating||elo;
   let lifetime=0; for(const k of ["chess_rapid","chess_blitz","chess_bullet","chess_daily"]){const r=stats?.[k]?.record; if(r)lifetime+=(r.win||0)+(r.loss||0)+(r.draw||0);} lifetime=Math.max(lifetime,total);
   const tacticsR=stats?.tactics?.highest?.rating||null, puzzleBonus=tacticsR?clamp((tacticsR-elo)/60,-3,5):0;
