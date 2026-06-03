@@ -74,7 +74,6 @@
   .card.or{background:linear-gradient(160deg,#fff0a0 0%,#f4cf52 42%,#d2a32e 100%);color:#3a2a05}
   .card.emeraude{background:linear-gradient(160deg,#1fae6b 0%,#0f7a48 50%,#063b25 100%);color:#eafff4;box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.25),0 0 28px rgba(31,174,107,.35)}
   .card.platine{background:linear-gradient(160deg,#eaf7ff 0%,#9ed2f7 32%,#4f9ee6 64%,#2766b4 100%);color:#0e2238;box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 2px rgba(255,255,255,.75),0 0 32px rgba(60,150,235,.55)}
-  .card.platine::before{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(115deg,transparent 30%,rgba(255,255,255,.55) 44%,transparent 52%);opacity:.7}
   .card.monstre{background:linear-gradient(160deg,#4a0f17 0%,#23070f 52%,#07030a 100%);color:#ffd9d0;box-shadow:0 30px 60px rgba(0,0,0,.6),inset 0 0 0 1px rgba(255,90,110,.35),0 0 34px rgba(220,30,50,.4)}
   .card.legend{background:linear-gradient(160deg,#2b3b6e 0%,#101a3c 48%,#05060f 100%);color:#f4efda;box-shadow:0 30px 60px rgba(0,0,0,.6),inset 0 0 0 2px rgba(212,175,55,.6),0 0 40px rgba(120,150,230,.45)}
   .card.legend::before{content:"";position:absolute;inset:0;z-index:1;background:radial-gradient(1.5px 1.5px at 20% 25%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 70% 18%,#ffe9a8 50%,transparent),radial-gradient(1px 1px at 45% 40%,#fff 50%,transparent),radial-gradient(1.5px 1.5px at 82% 55%,#cfe0ff 50%,transparent),radial-gradient(1px 1px at 30% 62%,#fff 50%,transparent);opacity:.8}
@@ -144,6 +143,43 @@
   a{color:var(--acc2)}
   .foot-link{margin-top:34px;text-align:center;font-family:"JetBrains Mono";font-size:11px;color:var(--muted)}
 
+  /* flip */
+  .flip{width:340px;height:560px;perspective:1500px;cursor:pointer}
+  .flip-inner{position:relative;width:100%;height:100%;transition:transform .7s cubic-bezier(.4,.2,.2,1);transform-style:preserve-3d}
+  .flip-inner.flipped{transform:rotateY(180deg)}
+  .flip .card{position:absolute!important;inset:0;width:340px;height:560px;backface-visibility:hidden;-webkit-backface-visibility:hidden}
+  .flip .card.back{transform:rotateY(180deg)}
+  .back-list{display:flex;flex-direction:column;gap:7px;margin-top:18px;font-family:"JetBrains Mono";font-size:13px}
+  .back-list div{display:flex;justify-content:space-between;gap:10px;border-bottom:1px solid rgba(255,255,255,.12);padding-bottom:6px}
+  .back-list b{font-family:"Anton";font-weight:400;font-size:16px}
+
+  /* skeleton */
+  .skel-card{width:340px;height:560px;border-radius:22px;background:linear-gradient(110deg,#11161f 30%,#1a2230 50%,#11161f 70%);background-size:220% 100%;animation:shimmer 1.3s linear infinite}
+  .bd-card.skel{background:linear-gradient(110deg,#11161f 30%,#1a2230 50%,#11161f 70%);background-size:220% 100%;animation:shimmer 1.3s linear infinite;border:none}
+  @keyframes shimmer{to{background-position:-220% 0}}
+
+  /* confetti */
+  .confetti{position:fixed;inset:0;pointer-events:none;z-index:9999;overflow:hidden}
+  .confetti i{position:absolute;top:-14px;width:8px;height:14px;border-radius:2px;animation:fall linear forwards}
+  @keyframes fall{to{transform:translateY(112vh) rotate(620deg);opacity:.15}}
+
+  /* percentile + badges */
+  .pcbar{height:12px;border-radius:99px;background:#070a0f;border:1px solid var(--line);overflow:hidden}
+  .pcfill{height:100%;border-radius:99px;transition:width .8s ease}
+  .badges{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .badge{font-family:"JetBrains Mono";font-size:11px;font-weight:700;background:#070a0f;border:1px solid var(--line);border-radius:99px;padding:6px 11px}
+
+  /* heatmap */
+  .heat{display:flex;flex-direction:column;gap:3px;font-family:"JetBrains Mono"}
+  .heat-row{display:flex;align-items:center;gap:3px}
+  .heat-day{width:26px;font-size:10px;color:var(--muted)}
+  .heat-row i{flex:1;height:13px;border-radius:2px}
+  .heat-hours{display:flex;justify-content:space-between;margin-left:29px;font-size:9px;color:var(--muted);margin-top:3px}
+
+  /* endbar */
+  .endbar{display:flex;height:16px;border-radius:6px;overflow:hidden;background:#070a0f;border:1px solid var(--line)}
+  .endseg{height:100%}
+
   .cmp-cards{display:flex;gap:24px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
   .cmp-table{max-width:560px;margin:0 auto}
   .cmp-row{display:grid;grid-template-columns:1fr 110px 1fr;align-items:center;gap:8px;padding:9px 12px;border-bottom:1px solid var(--line);font-family:"JetBrains Mono";font-size:14px}
@@ -155,7 +191,7 @@
   .cmp-names .l{text-align:right}.cmp-names .r{text-align:left}
 
   @media(max-width:680px){body{padding:18px 10px 70px}.row{flex-direction:column;align-items:stretch}.field.grow,.field{width:100%}button.go{width:100%}}
-  @media(max-width:372px){.card:not(.exporting){transform:scale(.92);transform-origin:top center;margin-bottom:-44px}}
+  @media(max-width:372px){.flip{transform:scale(.92);transform-origin:top center;margin-bottom:-44px}.cmp-cards .card:not(.exporting){transform:scale(.9);transform-origin:top center}}
 </style>
 </head>
 <body>
@@ -202,7 +238,11 @@
 
   <div class="result" id="result">
     <div class="card-stage">
-      <div class="card" id="card"></div>
+      <div class="flip" id="flip"><div class="flip-inner" id="flipInner">
+        <div class="card front" id="card"></div>
+        <div class="card back" id="cardBack"></div>
+      </div></div>
+      <div class="note" style="margin-top:-6px;opacity:.7">clique la carte pour la retourner ↻</div>
       <div class="dl">
         <button id="png">⬇ télécharger PNG</button>
         <button id="banner">⬇ bannière</button>
@@ -294,7 +334,7 @@ async function run(){
   if(user==="lusowall" && !window.__lw){ window.__lw=true; render(creatorData()); $("result").classList.add("on"); setStatus("✨ carte créateur — re-cherche lusowall pour les vraies stats"); $("result").scrollIntoView({behavior:"smooth",block:"start"}); return; }
   const tc=$("tc").value, dv=$("depth").value, target=dv==="all"?Infinity:parseInt(dv,10);
   $("go").disabled=true; $("result").classList.remove("on");
-  setStatus("récupération du profil…"); setBar(4);
+  setStatus("récupération du profil…"); setBar(4); showSkeleton();
   try{
     const data=await buildData(user,target,"status","bar",tc);
     render(data);
@@ -304,7 +344,7 @@ async function run(){
     if(e.message==="404") setStatus("ce pseudo existe pas sur chess.com 🤔",true);
     else if(e.message==="nogames") setStatus("aucune partie trouvée pour ce joueur (ou cette cadence)",true);
     else { console.error(e); setStatus("oups, erreur réseau ou API. réessaie.",true); }
-    hideBar();
+    $("result").classList.remove("on"); hideBar();
   }finally{ $("go").disabled=false; }
 }
 
@@ -344,6 +384,8 @@ function analyse(user,games,profile,stats,tcFilter){
   let zeitnotMoves=0,clockMoves=0, finalRatioSum=0,finalRatioN=0;
   let perfSum=0,perfN=0;
   const openings={}, opp={}, byDay={}, chrono=[], eloSeries=[], tcCtrl={};
+  const heat=Array.from({length:7},()=>new Array(24).fill(0)); let heatMax=0;
+  let maxMoves=0,minMoves=999; const endTypes={mat:0,abandon:0,temps:0,nulle:0,autre:0};
   const drawRes=new Set(["agreed","repetition","stalemate","insufficient","timevsinsufficient","50move"]);
 
   for(const g of games){
@@ -383,8 +425,12 @@ function analyse(user,games,profile,stats,tcFilter){
     if(g.time_control)tcCtrl[g.time_control]=(tcCtrl[g.time_control]||0)+1;
     if(g.rated&&me.rating)eloSeries.push({t:(g.end_time||0)*1000,r:me.rating});
     if(g.rated){ const on=you.username; opp[on]=opp[on]||{n:0,w:0,l:0}; opp[on].n++; if(res==="W")opp[on].w++; else if(res==="L")opp[on].l++; }
-    const t=(g.end_time||0)*1000, dt=new Date(t), day=dt.toISOString().slice(0,10), h=dt.getHours();
+    const t=(g.end_time||0)*1000, dt=new Date(t), day=dt.toISOString().slice(0,10), h=dt.getHours(), dow=dt.getDay();
     if(h>=22||h<6)nightGames++;
+    if(g.end_time){ const c=++heat[dow][h]; if(c>heatMax)heatMax=c; }
+    if(mv>0){ if(mv>maxMoves)maxMoves=mv; if(mv<minMoves)minMoves=mv; }
+    const reason = res==="D" ? "nulle" : (res==="W"?you.result:me.result);
+    endTypes[reason==="checkmated"?"mat":reason==="resigned"?"abandon":reason==="timeout"?"temps":reason==="nulle"?"nulle":"autre"]++;
     (byDay[day]=byDay[day]||[]).push({t,res}); chrono.push({t,res,rated:!!g.rated});
   }
 
@@ -486,6 +532,7 @@ function analyse(user,games,profile,stats,tcFilter){
     whiteWR:pct(whiteW,whiteN),blackWR:pct(blackW,blackN),
     horloger,drawRate,worstStreak,repertoire,knownRate,solidRate,favWR,favOpenings,bestOpening,worstOpening,nemesis,punchball,
     bestWinStreak,worstLossStreak,curStreak,curRes,topBeat,variantRate,nightShare,avgOppElo,joinYear,eloSeries:eloSorted,
+    heat,heatMax,maxMoves,minMoves:(minMoves===999?0:minMoves),endTypes,accountYears,upsetRate,
     checksGiven:Math.round(checksGiven*10)/10, perfPerGame:Math.round(perfPerGame*100), zeitnotRate, postLossWR, tiltDrop };
 }
 
@@ -520,7 +567,7 @@ function cardHTML(d){
   const foot = d.footRows || [["NÉMÉSIS",d.nemesis?d.nemesis.nm:"—"],["PUNCHING-BALL",d.punchball?d.punchball.nm:"—"],["PARTIES JOUÉES",d.lifetime.toLocaleString("fr-FR")],["BILAN",`${d.W}V ${d.D}N ${d.L}D · ${d.winRate}%`]];
   return `
     <div class="c-top">
-      <div class="c-ovr">${d.OVR}<small>OVR</small></div>
+      <div class="c-ovr"><span data-count="${d.OVR}">${d.OVR}</span><small>OVR</small></div>
       <div>
         <div class="c-meta">ELO ${d.elo} · ${d.tierName} · ${d.modeLabel}</div>
         <div class="c-flag">${d.country}</div>
@@ -543,17 +590,35 @@ function cardHTML(d){
 }
 function applyCard(el,d){ el.className="card "+d.tier; el.innerHTML=cardHTML(d); }
 
+function backHTML(d){
+  const rows=[["perf vs elo",(d.perfPerGame>0?"+":"")+d.perfPerGame+" /100"],["échecs donnés/partie",d.checksGiven],["coups en zeitnot",d.zeitnotRate!==null?d.zeitnotRate+"%":"—"],["winrate après défaite",d.postLossWR+"%"],["elo moyen adverse",d.avgOppElo||"—"],["ouvertures connues",d.knownRate+"%"],["ouvertures solides",d.solidRate+"%"],["partie la + longue",(d.maxMoves||"—")+" coups"],["partie la + courte",(d.minMoves||"—")+" coups"],["série en cours",d.curStreak>=2?d.curStreak+(d.curRes==="W"?" V":" D"):"—"]];
+  return `<div class="c-top"><div class="c-ovr" style="font-size:30px">détail<small>${esc(d.name).slice(0,14)}</small></div><div class="c-meta">${d.tierName} · ${d.elo}</div></div>
+    <div class="back-list">${rows.map(r=>`<div><span>${r[0]}</span><b>${esc(String(r[1]))}</b></div>`).join("")}</div>
+    <div class="c-watermark" style="margin-top:auto">↻ recto · ${SITE}</div>`;
+}
 function render(d){
   window.__last=d;
   document.body.className="theme-"+d.tier;
+  $("flipInner").classList.remove("flipped");
   applyCard($("card"),d);
+  const back=$("cardBack"); back.className="card back "+d.tier; back.innerHTML=backHTML(d);
+  animateCounters($("card"));
+  if(["legend","monstre","creator"].includes(d.tier)) dropEffect();
   const cur=d.curStreak>=2?`${d.curStreak} ${d.curRes==="W"?"victoires":"défaites"} de suite`:"—";
+  const pc=percentileOf(d.elo), badges=badgesOf(d);
+  const endT=d.endTypes||{}, endTot=Object.values(endT).reduce((a,b)=>a+b,0)||1;
   $("breakdown").innerHTML=`
     <div class="bd-card arche-card">
       <h3>archétype + faits marquants</h3>
       <div class="arche-title">${d.arche.t}</div><div class="arche-sub">« ${d.arche.d} »</div>
       <p class="note arche-why">${esc(d.arche.why)}.</p>
       <div class="feats">${(d.feats.length?d.feats:[{t:d.flagship.txt}]).map(f=>`<div class="feat">${esc(f.t)}</div>`).join("")}</div>
+    </div>
+    <div class="bd-card">
+      <h3>classement + hauts faits</h3>
+      <div class="pcbar"><div class="pcfill" style="width:${pc}%;background:${TIERCOL[d.tier]||'#46c2a8'}"></div></div>
+      <p class="note" style="margin-top:8px">≈ meilleur que <b>${pc}%</b> des joueurs chess.com (estimation sur la distribution des elo).</p>
+      ${badges.length?`<div class="badges">${badges.map(b=>`<span class="badge">${esc(b)}</span>`).join("")}</div>`:""}
     </div>
     <div class="bd-card"><h3>radar des notes</h3><div class="radar-wrap">${radar([{S:d.S,color:TIERCOL[d.tier]||"#46c2a8"}])}</div></div>
     ${d.eloSeries&&d.eloSeries.length>=2?`<div class="bd-card"><h3>courbe d'elo (échantillon)</h3>${sparkline(d.eloSeries,TIERCOL[d.tier]||"#46c2a8")}</div>`:""}
@@ -583,6 +648,17 @@ function render(d){
         <div class="o"><span class="nm">némésis : <b>${d.nemesis?esc(d.nemesis.nm):"aucun"}</b></span><span class="wr">${d.nemesis?`${d.nemesis.l}D / ${d.nemesis.n}`:""}</span></div>
         <div class="o"><span class="nm">punching-ball : <b>${d.punchball?esc(d.punchball.nm):"aucun"}</b></span><span class="wr">${d.punchball?`${d.punchball.w}V / ${d.punchball.n}`:""}</span></div>
       </div><p class="note" style="margin-top:10px">bots et parties non classées exclus.</p></div>
+    <div class="bd-card"><h3>quand tu joues (heatmap)</h3>${heatmapHTML(d.heat,d.heatMax,TIERCOL[d.tier]||"#46c2a8")}</div>
+    <div class="bd-card"><h3>durées & fins de partie</h3>
+      <div class="kv" style="margin-bottom:12px">
+        <div class="b"><div class="n">${d.maxMoves||"—"}</div><div class="l">partie la + longue (coups)</div></div>
+        <div class="b"><div class="n">${d.minMoves||"—"}</div><div class="l">partie la + courte (coups)</div></div>
+      </div>
+      <div class="endbar">
+        ${[["mat","var(--acc)"],["abandon","#9bb3ff"],["temps","#46c2a8"],["nulle","#8893a3"],["autre","#5a6573"]].map(([k,c])=>{const p=pct(endT[k]||0,endTot);return p?`<div class="endseg" style="width:${p}%;background:${c}" title="${k} ${p}%"></div>`:"";}).join("")}
+      </div>
+      <p class="note" style="margin-top:8px">${[["mat"],["abandon"],["temps"],["nulle"]].map(([k])=>`${k} ${pct(endT[k]||0,endTot)}%`).join(" · ")}</p>
+    </div>
     <p class="note" style="text-align:center">échantillon : <b>${d.total.toLocaleString("fr-FR")}</b> parties récentes sur ${d.lifetime.toLocaleString("fr-FR")} (~${d.sampleRate}%).</p>`;
 }
 
@@ -612,8 +688,57 @@ function radar(sets){
   return s+`</svg>`;
 }
 
-function stat(lab,v){ return `<div class="stat"><b>${v}</b><span>${lab}</span></div>`; }
+function stat(lab,v){ return `<div class="stat"><b data-count="${v}">${v}</b><span>${lab}</span></div>`; }
 function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+// percentile approximé (distribution publique chess.com)
+function percentileOf(elo){
+  const pts=[[300,2],[500,8],[700,20],[900,36],[1100,54],[1300,70],[1500,82],[1700,90],[1900,95],[2100,98],[2300,99],[2500,99.7]];
+  if(elo<=pts[0][0])return pts[0][1]; if(elo>=pts[pts.length-1][0])return pts[pts.length-1][1];
+  for(let i=0;i<pts.length-1;i++){ if(elo>=pts[i][0]&&elo<pts[i+1][0]){ const r=(elo-pts[i][0])/(pts[i+1][0]-pts[i][0]); return Math.round((pts[i][1]+r*(pts[i+1][1]-pts[i][1]))*10)/10; } }
+  return 50;
+}
+function badgesOf(d){
+  const b=[];
+  if(d.title)b.push("🎖 "+d.title);
+  if(d.lifetime>=10000)b.push("♟ 10 000+ parties"); else if(d.lifetime>=1000)b.push("♟ 1 000+ parties");
+  if(d.topBeat>=2200)b.push("🐉 a battu un maître");
+  if(d.bestWinStreak>=10)b.push("🔥 "+d.bestWinStreak+" wins d'affilée");
+  if(d.nightShare>=40)b.push("🌙 no-lifer nocturne");
+  if(d.upsetRate>=25)b.push("⚔ tombeur de géants");
+  if(d.accountYears>=8)b.push("🏛 vétéran");
+  if(d.S&&d.S.MTL>=85)b.push("🧊 nerfs d'acier");
+  return b.slice(0,6);
+}
+function heatmapHTML(heat,heatMax,color){
+  if(!heatMax) return `<div class="note">pas d'horodatage exploitable</div>`;
+  const days=["dim","lun","mar","mer","jeu","ven","sam"];
+  let h=`<div class="heat">`;
+  for(let d=0;d<7;d++){ h+=`<div class="heat-row"><span class="heat-day">${days[d]}</span>`;
+    for(let hh=0;hh<24;hh++){ const v=heat[d][hh],o=v?(.15+.85*v/heatMax):0; h+=`<i style="background:${v?color:'#161b24'};opacity:${v?o:1}" title="${days[d]} ${hh}h : ${v}"></i>`; }
+    h+=`</div>`; }
+  h+=`<div class="heat-hours"><span>0h</span><span>6h</span><span>12h</span><span>18h</span><span>23h</span></div></div>`;
+  return h;
+}
+function animateCounters(root){
+  root.querySelectorAll("[data-count]").forEach(el=>{
+    const tgt=+el.getAttribute("data-count"); if(isNaN(tgt))return;
+    const dur=750,t0=performance.now(); el.textContent="0";
+    const step=now=>{ const p=Math.min(1,(now-t0)/dur); el.textContent=Math.round(tgt*(1-Math.pow(1-p,3))); if(p<1)requestAnimationFrame(step); };
+    requestAnimationFrame(step);
+  });
+}
+function dropEffect(){
+  const c=document.createElement("div"); c.className="confetti";
+  const cols=["#e8c14e","#46c2a8","#ff5a6e","#9bb3ff","#f0d98a","#33d9a0"];
+  for(let i=0;i<46;i++){ const s=document.createElement("i"); s.style.cssText=`left:${Math.random()*100}%;background:${cols[i%cols.length]};animation-delay:${Math.random()*.4}s;animation-duration:${1+Math.random()*1.3}s`; c.appendChild(s); }
+  document.body.appendChild(c); setTimeout(()=>c.remove(),2600);
+}
+function showSkeleton(){
+  $("card").className="card"; $("card").innerHTML=`<div class="skel-card"></div>`;
+  $("breakdown").innerHTML=`<div class="bd-card skel" style="height:120px"></div><div class="bd-card skel" style="height:200px"></div>`;
+  $("result").classList.add("on");
+}
 
 async function exportPNG(copy){
   await document.fonts.ready;
@@ -669,7 +794,8 @@ function creatorData(){
     whiteWR:100,blackWR:100,avgOppElo:3000,curStreak:99,curRes:"W",
     horloger:99,drawRate:0,worstStreak:0,repertoire:99,knownRate:100,solidRate:50,favWR:100,
     favOpenings:[{nm:"Toutes les ouvertures",n:999,wr:100}], nemesis:null,punchball:null,
-    bestWinStreak:99,worstLossStreak:0,topBeat:3500,variantRate:50,nightShare:80,
+    bestWinStreak:99,worstLossStreak:0,topBeat:3500,variantRate:50,nightShare:80,accountYears:5,upsetRate:50,
+    maxMoves:120,minMoves:7,endTypes:{mat:55,abandon:30,temps:8,nulle:5,autre:2},heat:null,heatMax:0,
     checksGiven:9.9,perfPerGame:99,zeitnotRate:0,postLossWR:100,tiltDrop:0 };
 }
 
@@ -695,7 +821,10 @@ function fakeData(){
     horloger:rnd(10,55),drawRate:rnd(2,20),worstStreak:rnd(2,8),repertoire:rnd(8,35),knownRate:rnd(70,98),solidRate:rnd(5,55),favWR:rnd(45,65),
     favOpenings:[{nm:"Sicilian Defense",n:rnd(20,60),wr:rnd(45,65)},{nm:"Caro Kann Defense",n:rnd(10,30),wr:rnd(40,60)},{nm:"Queens Gambit",n:rnd(8,20),wr:rnd(40,60)}],
     nemesis:{nm:"DarkKnight_99",l:rnd(4,9),n:rnd(10,15)}, punchball:{nm:"easyfood42",w:rnd(5,10),n:rnd(8,12)},
-    checksGiven:(rnd(8,22)/10),perfPerGame:rnd(-8,8),zeitnotRate:rnd(5,40),postLossWR:rnd(35,60) };
+    checksGiven:(rnd(8,22)/10),perfPerGame:rnd(-8,8),zeitnotRate:rnd(5,40),postLossWR:rnd(35,60),
+    maxMoves:rnd(60,120),minMoves:rnd(6,18),accountYears:rnd(1,11),upsetRate:rnd(8,35),
+    endTypes:{mat:rnd(20,60),abandon:rnd(20,50),temps:rnd(5,25),nulle:rnd(2,15),autre:rnd(0,5)},
+    heat:Array.from({length:7},()=>Array.from({length:24},()=>rnd(0,8))),heatMax:8 };
 }
 function testCycle(){ const d=fakeData(); render(d); $("result").classList.add("on"); setStatus("RENDU TEST : "+d.tierName); }
 
@@ -713,6 +842,7 @@ $("banner").addEventListener("click",exportBanner);
 $("copy").addEventListener("click",()=>exportPNG(true));
 $("link").addEventListener("click",copyLink);
 $("random").addEventListener("click",randomPlayer);
+$("flip").addEventListener("click",()=>{ if(window.__last)$("flipInner").classList.toggle("flipped"); });
 $("goCompare").addEventListener("click",compareRun);
 $("userB").addEventListener("keydown",e=>{if(e.key==="Enter")compareRun();});
 $("modeSolo").addEventListener("click",()=>setMode("solo"));
