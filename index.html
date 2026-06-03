@@ -12,7 +12,7 @@
   :root{--bg:#0a0d12;--bg2:#11161f;--ink:#e9edf2;--muted:#8893a3;--line:#222a36;--acc:#e8c14e;--acc2:#46c2a8;--bad:#e2603f;--t1:#1a2230;--t2:#161b27;--t3:#11151e}
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{height:100%}
-  body{background:radial-gradient(1000px 700px at 12% -8%,var(--t1) 0%,transparent 52%),radial-gradient(900px 600px at 112% 8%,var(--t2) 0%,transparent 48%),radial-gradient(800px 600px at 50% 118%,var(--t3) 0%,transparent 55%),var(--bg);color:var(--ink);font-family:"Chivo",system-ui,sans-serif;min-height:100%;padding:28px 18px 70px;-webkit-font-smoothing:antialiased;transition:background .6s ease}
+  body{background:radial-gradient(1000px 700px at 12% -8%,var(--t1) 0%,transparent 52%),radial-gradient(900px 600px at 112% 8%,var(--t2) 0%,transparent 48%),radial-gradient(800px 600px at 50% 118%,var(--t3) 0%,transparent 55%),var(--bg);background-attachment:fixed;color:var(--ink);font-family:"Chivo",system-ui,sans-serif;min-height:100%;padding:28px 18px 70px;-webkit-font-smoothing:antialiased;transition:background .6s ease}
   body::before{content:"";position:fixed;inset:0;pointer-events:none;opacity:.035;z-index:0;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='100' height='100'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100' height='100' filter='url(%23n)'/%3E%3C/svg%3E")}
   .wrap{max-width:1040px;margin:0 auto;position:relative;z-index:1}
   body.theme-troll{--t1:#5a1042;--t2:#5a1018;--t3:#3a0820;--acc2:#ff3aa5}
@@ -63,7 +63,7 @@
 
   .card-stage{display:flex;flex-direction:column;align-items:center;gap:16px}
   .card{width:340px;height:560px;border-radius:22px;position:relative;overflow:hidden;font-family:"Chivo";padding:20px 22px 14px;color:#1c1606;display:flex;flex-direction:column;box-shadow:0 30px 60px rgba(0,0,0,.55),inset 0 0 0 1px rgba(255,255,255,.18)}
-  .card.exporting{box-shadow:inset 0 0 0 1px rgba(255,255,255,.18)!important;transform:none!important;margin:0!important}
+  .card.exporting{box-shadow:none!important;transform:none!important;margin:0!important}
   .card *{position:relative;z-index:2}
   .card.troll{background:linear-gradient(160deg,#ff3aa5,#ff6a3d 55%,#ffd23a);color:#2a0018}
   .card.troll::before{content:"";position:absolute;inset:0;z-index:1;background:repeating-linear-gradient(45deg,rgba(0,255,150,.20) 0 12px,transparent 12px 24px)}
@@ -567,9 +567,14 @@ function esc(s){ return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;'
 
 async function exportPNG(copy){
   await document.fonts.ready;
-  const card=$("card"); card.classList.add("exporting");
-  let canvas; try{ canvas=await html2canvas(card,{scale:3,backgroundColor:null,useCORS:true,width:card.offsetWidth,height:card.offsetHeight,scrollX:0,scrollY:0,windowWidth:document.documentElement.offsetWidth}); }
-  finally{ card.classList.remove("exporting"); }
+  const src=$("card");
+  const clone=src.cloneNode(true);
+  clone.classList.add("exporting");
+  clone.style.cssText="position:fixed;left:-10000px;top:0;width:340px;height:560px;margin:0;transform:none;box-shadow:none;border-radius:22px";
+  document.body.appendChild(clone);
+  let canvas;
+  try{ canvas=await html2canvas(clone,{scale:3,backgroundColor:null,useCORS:true,width:340,height:560,windowWidth:1100,windowHeight:900}); }
+  finally{ clone.remove(); }
   if(copy){ canvas.toBlob(async b=>{ try{ await navigator.clipboard.write([new ClipboardItem({"image/png":b})]); setStatus("image copiée ✓"); }catch{ setStatus("copie non supportée, utilise télécharger",true);} }); }
   else{ const a=document.createElement("a"); a.download="chesscard-"+($("user").value.trim()||"joueur")+".png"; a.href=canvas.toDataURL("image/png"); a.click(); }
 }
